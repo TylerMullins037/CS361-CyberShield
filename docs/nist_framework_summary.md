@@ -12,4 +12,14 @@ Guidance to industry, government agencies, and other organizations to manage and
 - Recover: Helps organizations restore services and minimize damage after an incident. Includes recovery planning, improvements, and communication strategies.
 - Detect: Provides mechanisms to monitor, identify, and detect cybersecurity events. Involves continuous security monitoring, anomaly detection, and event logging.
 
+# NIST SP 800-37 Risk Management Framework (RMF)
+The Risk Management Framework provides a structured and flexible process for managing organizations' cybersecurity and privacy risks. 
+### Seven key steps:
+- Prepare: Establish the foundation for risk management by defining roles, strategies, risk assessments, control baselines, and continuous monitoring plans.
+- Categorize: Determine the potential impact of security breaches on confidentiality, integrity, and availability of systems and data.
+- Select: Choose, tailor, and document security controls from NIST SP 800-53 based on risk assessments.
+- Implement: Deploy and document the security controls within the system.
+- Access: Evaluate whether the implemented controls function correctly and meet security and privacy requirements.
+- Authorize: Senior officials review risk analysis and determine whether the system is authorized to operate.
+- Monitor: Continuously oversee security controls, reassess risks, and respond to changes in the system and environment.
 
