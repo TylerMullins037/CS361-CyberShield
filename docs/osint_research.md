@@ -1,8 +1,8 @@
-1. Shodan (shodan.io) - Best for Identifying Exposed Assets
-Purpose: Scans the internet for exposed devices, services, and vulnerabilities.
-API Capabilities: Allows querying for open ports, services, and security vulnerabilities.
-Integration Use Case: Monitor ShopSmart Solutions’ exposed IPs, servers, and devices for misconfigurations or security risks.
-Best Feature: Identifies open ports, outdated services, and vulnerable devices in real-time.
+1. Shodan (shodan.io) - Best for Identifying Exposed Assets  
+Purpose: Scans the internet for exposed devices, services, and vulnerabilities.  
+API Capabilities: Allows querying for open ports, services, and security vulnerabilities.  
+Integration Use Case: Monitor ShopSmart Solutions’ exposed IPs, servers, and devices for misconfigurations or security risks.  
+Best Feature: Identifies open ports, outdated services, and vulnerable devices in real-time.  
 
 2. Have I Been Pwned (haveibeenpwned.com) - Best for Credential Leaks
 Purpose: Checks if emails or credentials associated with ShopSmart Solutions have been compromised in data breaches.
