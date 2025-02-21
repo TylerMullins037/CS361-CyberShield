@@ -1,5 +1,5 @@
 Back-End:  
 Front-End:  
-Database: PostgreSQL
+Database: PostgreSQL  
 OSINT API:  
 LLM Model for Risk Scoring:  
