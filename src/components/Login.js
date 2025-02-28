@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Typography, Card, CardContent } from "@mui/material";
+import { useAuth } from "../AuthContext";
 
 const Login = () => {
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -11,6 +13,7 @@ const Login = () => {
   const handleLogin = () => {
     // Mock authentication (Replace with real authentication logic)
     if (username === "admin" && password === "password") {
+      login(); // Set authentication state
       navigate("/dashboard"); // Redirect to Dashboard
     } else {
       setError("Invalid username or password.");
@@ -24,7 +27,7 @@ const Login = () => {
           <Typography variant="h5" gutterBottom>
             Login
           </Typography>
-          
+
           {error && <Typography color="error">{error}</Typography>}
 
           <TextField

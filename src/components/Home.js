@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
-    <Container style={{ textAlign: "center", marginTop: "100px" }}>
+    <Container style={{ textAlign: "center", marginTop: "100px", color: "#0084ff",}}>
       <Typography variant="h3" gutterBottom>
       Real-Time Threat Intelligence
       </Typography>
