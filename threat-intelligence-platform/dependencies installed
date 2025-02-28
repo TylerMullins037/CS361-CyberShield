@@ -1,5 +1,0 @@
-"npm install express axios dotenv"
-
-express → Web framework for Node.js.
-axios → For making HTTP requests (similar to requests in Python).
-dotenv → For managing environment variables.
