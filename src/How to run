@@ -1,0 +1,9 @@
+install node.js
+npm install @mui/material @mui/lab @mui/icons-material @emotion/react @emotion/styled
+npm install react-router-dom
+
+cd path/to/your/folder
+npx create-react-app threat-dashboard
+
+replace github src code files
+npm start
