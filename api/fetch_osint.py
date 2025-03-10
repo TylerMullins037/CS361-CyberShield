@@ -29,8 +29,7 @@ def security_data():
     return response
 
 def virus_data_fetch(domain):
-    """Integrating virus_total to fetch data about the reputation of the domain and
-    it is security status"""
+    ""Integrating VirusTotal to fetch data about the reputation of the domain and its security status."""
     url = f"https://www.virustotal.com/api/v3/ip_addresses/{domain}"
     header = VirusTotal.headers
     response =requests.get(url, headers=header)
@@ -41,7 +40,7 @@ def virus_data_fetch(domain):
         print(f"Error in fetching data from virus total {response.status_code}")
         return
 
-    #integrating it with the database
+    #Storing our threat analysis in the database
 def store_threat_intelligence(threat_name, vulnerability, likelihood, impact):
     #fetching threat intelligence and storing them into the PostgreSQL database
     try:
@@ -55,7 +54,7 @@ def store_threat_intelligence(threat_name, vulnerability, likelihood, impact):
 vulnerability_description, likelihood, impact) VALUES
 (%s, %s, %s, %s, %s)"""
         , (threat_name, vulnerability, likelihood, impact))
-        conn.commit() #To finalize transaction the database
+        conn.commit() #Save the transaction made to the database
         cursor.close() #close the cursor from executing
         conn.close() #close the connection to database
 
@@ -89,7 +88,7 @@ def Main():
                                           vulnerability=f"Domain reputation score: {threat_score}",
                                           likelihood=3,impact=4)
 
-            #fetch dta with security trails
+            #fetch data with security trails
             security_trails_data=security_data()
             if security_trails_data:
                 for record in security_trails_data.get('records', []):
