@@ -5,5 +5,5 @@ CREATE TABLE tva_mapping (
     vulnerability_description TEXT,
     likelihood INT CHECK (likelihood BETWEEN 1 AND 5),
     impact INT CHECK (impact BETWEEN 1 AND 5),
-    risk_score INT,
+    risk_score INT
 );
