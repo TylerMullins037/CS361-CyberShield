@@ -11,10 +11,10 @@ def get_db_connection():
     try:
         conn = psycopg2.connect(
             dbname="defaultdb", 
-            user="*******", 
-            password="*********", 
+            user="******", 
+            password="******",
+            port = "25060", 
             host="**********",
-            port="25060",
             sslmode="require"  # Ensures secure connection
         )
         return conn
@@ -58,6 +58,24 @@ def get_threats():
     cursor.close()
     conn.close()
     return jsonify(threats)
+
+@app.route('/api/threat_data', methods=['GET'])
+def get_threats_data():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Failed to connect to the database"}), 500
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT ip_address, ports, services FROM threat_data")
+    threats_data = [
+        {"ip_address": row[0], "ports": row[1], "services": row[2]}
+        for row in cursor.fetchall()
+    ]
+    
+    cursor.close()
+    conn.close()
+    return jsonify(threats_data)
+
 
 # Serve static files (JS, CSS, images, etc.)
 @app.route('/<path:path>')
