@@ -14,29 +14,20 @@ import {
 } from "@mui/material";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
-// Sample data for Asset Inventory (WILL CHANGE ONCE DATABASE IS FULLY INTEGRATED)
-const mockAssets = [
-  { id: 1, asset_name: "Web Server", asset_type: "Software", description: "A software-based server that hosts web applications and services, currently in active operation." },
-  { id: 2, asset_name: "Database", asset_type: "Software", description: "A software system used for storing and managing structured data, actively running." },
-  { id: 3, asset_name: "Workstation", asset_type: "Hardware", description: "A physical computing device used by employees, currently identified as vulnerable to security threats." },
-];
-
-// Sample data for Threat-Vulnerability Mappings with risk scores
-const mockThreats = [
-  { name: "SQL Injection", vulnerability: "Unpatched Database", likelihood: 4, impact: 5, risk_score: 20 },
-  { name: "Phishing", vulnerability: "Weak Employee Awareness", likelihood: 5, impact: 4, risk_score: 20 },
-  { name: "Ransomware", vulnerability: "Outdated Backup Policies", likelihood: 3, impact: 4, risk_score: 12 },
-];
-
-// Function to simulate dynamic real-time risk scores update
-const generateRiskScores = () => {
-  return mockAssets.map((asset) => ({
-    asset: asset.name,
-    risk: Math.floor(Math.random() * 25),
-  }));
+// Function to fetch assets from your server
+const fetchAssets = async () => {
+  const response = await fetch("http://localhost:5000/api/assets");
+  const data = await response.json();
+  return data;
 };
 
-// Threat List Component
+// Function to fetch threats from your server
+const fetchThreats = async () => {
+  const response = await fetch("http://localhost:5000/api/threats");
+  const data = await response.json();
+  return data;
+};
+
 function ThreatList({ threats }) {
   return (
     <TableContainer component={Paper} sx={{ mt: 2 }}>
@@ -67,17 +58,38 @@ function ThreatList({ threats }) {
 }
 
 export default function ThreatDashboard() {
-  const [riskScores, setRiskScores] = useState(generateRiskScores());
+  const [assets, setAssets] = useState([]);
+  const [threats, setThreats] = useState([]);
+  const [riskScores, setRiskScores] = useState([]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRiskScores(generateRiskScores());
-    }, 5000);
-    return () => clearInterval(interval);
+    // Fetch the data when the component mounts
+    const fetchData = async () => {
+      const fetchedAssets = await fetchAssets();
+      const fetchedThreats = await fetchThreats();
+
+      setAssets(fetchedAssets);
+      setThreats(fetchedThreats);
+    };
+
+    fetchData();
   }, []);
 
+  useEffect(() => {
+    // Simulate dynamic real-time risk scores update
+    const interval = setInterval(() => {
+      const newRiskScores = assets.map((asset) => ({
+        asset: asset.asset_name,
+        risk: Math.floor(Math.random() * 25),
+      }));
+      setRiskScores(newRiskScores);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [assets]);
+
   return (
-    <Grid container spacing={3} sx={{ p: 3, backgroundColor: "#A9A9A9"}}>
+    <Grid container spacing={3} sx={{ p: 3, backgroundColor: "#A9A9A9" }}>
       {/* Asset Inventory */}
       <Grid item xs={12} md={6}>
         <Card sx={{ boxShadow: 3, backgroundColor: "#22303c" }}>
@@ -85,7 +97,7 @@ export default function ThreatDashboard() {
             <Typography variant="h6" gutterBottom sx={{ color: "#ffffff" }}>
               Asset Inventory
             </Typography>
-            <TableContainer component={Paper} >
+            <TableContainer component={Paper}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -95,7 +107,7 @@ export default function ThreatDashboard() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {mockAssets.map((asset) => (
+                  {assets.map((asset) => (
                     <TableRow key={asset.id}>
                       <TableCell>{asset.asset_name}</TableCell>
                       <TableCell>{asset.asset_type}</TableCell>
@@ -113,10 +125,10 @@ export default function ThreatDashboard() {
       <Grid item xs={12} md={6}>
         <Card sx={{ boxShadow: 3, backgroundColor: "#22303c" }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom sx={{ color: "#ffffff" }} >
+            <Typography variant="h6" gutterBottom sx={{ color: "#ffffff" }}>
               Threat Intelligence Overview
             </Typography>
-            <ThreatList threats={mockThreats} />
+            <ThreatList threats={threats} />
           </CardContent>
         </Card>
       </Grid>
@@ -137,6 +149,14 @@ export default function ThreatDashboard() {
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  );
+}
+
+
+
         </Card>
       </Grid>
     </Grid>
