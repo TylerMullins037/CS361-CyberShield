@@ -1,7 +1,9 @@
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory
+import requests
 from flask_cors import CORS
 import psycopg2
 import os
+import logging
 
 app = Flask(__name__, static_folder="threat-dashboard/build", static_url_path="")
 CORS(app)  # Allow frontend to access API
@@ -11,16 +13,18 @@ def get_db_connection():
     try:
         conn = psycopg2.connect(
             dbname="defaultdb", 
-            user="******", 
-            password="******",
+            user="doadmin", 
+            password="***************",
             port = "25060", 
-            host="**********",
+            host="******************",
             sslmode="require"  # Ensures secure connection
         )
         return conn
     except Exception as e:
         print(f"Database connection error: {e}")
         return None
+
+
 
 # Serve React frontend
 @app.route('/')
@@ -76,6 +80,25 @@ def get_threats_data():
     conn.close()
     return jsonify(threats_data)
 
+# Fetch high-risk threats by parsing the API response
+@app.route('/api/high_risk_threats', methods=['GET'])
+def get_high_risk_threats():
+    try:
+        # Internal API call to fetch all threats
+        response = requests.get("http://127.0.0.1:5000/api/threats")
+        
+        if response.status_code != 200:
+            return jsonify({"error": "Failed to retrieve threats from API"}), 500
+
+        threats = response.json()
+
+        # Filter threats with risk score > 20
+        high_risk_threats = [threat for threat in threats if threat["risk_score"] > 19]
+
+        return jsonify(high_risk_threats)
+
+    except Exception as e:
+        return jsonify({"error": f"Internal processing error: {str(e)}"}), 500
 
 # Serve static files (JS, CSS, images, etc.)
 @app.route('/<path:path>')
