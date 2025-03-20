@@ -51,14 +51,14 @@ export default function ThreatDashboard() {
   useEffect(() => {
     const interval = setInterval(() => {
       setRiskScores(
-        assets.map((asset) => ({
-          asset: asset.asset_name,
-          risk: Math.floor(Math.random() * 25),
+        threats.map((threat) => ({
+          threat: threat.name,
+          risk: threat.risk_score,
         }))
       );
     }, 5000);
     return () => clearInterval(interval);
-  }, [assets]);
+  }, [threats]);
 
   const filteredAssets = assets.filter((asset) => !filterType || asset.asset_type === filterType);
   const filteredThreats = threats.filter((threat) => !filterRisk || threat.risk_score >= filterRisk);
@@ -197,7 +197,7 @@ export default function ThreatDashboard() {
             </Typography>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={riskScores}>
-                <XAxis dataKey="asset" />
+                <XAxis dataKey="threat" />
                 <YAxis domain={[0, 25]} />
                 <Tooltip />
                 <Bar dataKey="risk" fill="#f43f5e" />
@@ -210,9 +210,4 @@ export default function ThreatDashboard() {
   );
 }
 
-
-
-    </Grid>
-  );
-}
 
