@@ -1,90 +1,91 @@
-import openai
+import asyncio
 import psycopg2
-from transformers import pipeline
+from ollama import chat
+from ollama import ChatResponse
+import re
 
-# OpenAI API Key (replace with your actual key)
-openai.api_key = ""  
-
-# Database connection
 def get_db_connection():
     return psycopg2.connect(
-        dbname="shopsmart", user="admin", password="securepass", host="localhost"
+        dbname="defaultdb", user="doadmin", password="***********8",
+        host="************", port="25060"
     )
 
-# Function to get asset and threat data
 def fetch_threat_data():
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT asset_id, threat_name, vulnerability_description FROM tva_mapping;")
+    cursor.execute("SELECT id, asset_id, threat_name, vulnerability_description FROM tva_mapping;")
     threats = cursor.fetchall()
     conn.close()
     return threats
 
-# Assign likelihood and impact scores dynamically
-def assign_likelihood_impact(threat_description):
+async def assign_likelihood_impact(threat_description):
     """
     Uses a rule-based approach + LLM-based refinement to calculate likelihood (L) and impact (I).
     """
-    # Step 1: Basic heuristic assignment
-    if "ransomware" in threat_description.lower():
-        likelihood = 3
-        impact = 4
-    elif "phishing" in threat_description.lower():
-        likelihood = 5
-        impact = 4
-    elif "sql injection" in threat_description.lower():
-        likelihood = 4
-        impact = 5
-    else:
-        likelihood = 2
-        impact = 3  # Default values
+    # Basic heuristic assignment
+    likelihood, impact = {
+        "ransomware": (3, 4),
+        "phishing": (5, 4),
+        "sql injection": (4, 5)
+    }.get(threat_description.lower(), (2, 3))
 
-    # Step 2: LLM Refinement (GPT-4)
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You are a cybersecurity risk assessment assistant."},
-            {"role": "user", "content": f"Analyze the following threat: {threat_description}. Assign a likelihood (1-5) and impact (1-5) based on industry trends."}
-        ]
-    )
-    refined_data = response["choices"][0]["message"]["content"].split()
-
+    # LLM Refinement
     try:
-        refined_likelihood = int(refined_data[1]) if refined_data[1].isdigit() else likelihood
-        refined_impact = int(refined_data[3]) if refined_data[3].isdigit() else impact
-    except:
-        refined_likelihood, refined_impact = likelihood, impact  # Fallback to heuristic scores
+        response = chat(model='deepseek-r1', messages=[{
+            'role': 'system',
+            'content': f"""
+            You are an expert in cybersecurity analysis. Please evaluate the following threat description based on current industry trends and standards.
+            For each threat, assign a likelihood (1-5) and an impact (1-5) score. Use the following guidelines:
+            - Likelihood: 1 = Very Unlikely, 5 = Very Likely
+            - Impact: 1 = Minimal Impact, 5 = Severe Impact
 
-    return refined_likelihood, refined_impact
+            The analysis should only consider factors like historical industry data, common attack vectors, and technical vulnerabilities relevant to this specific threat. 
 
-# Calculate risk score
-def calculate_risk_scores():
+            Please respond strictly in the following format:
+            'Likelihood: X, Impact: Y' 
+            where X and Y are integers from 1 to 5. Do not include any additional text or explanation.
+
+            Threat: {threat_description}
+            """
+        }])
+        # Get the raw response content
+        response_content = response.get('message', {}).get('content', '')
+
+        # Look for any potential patterns of "Likelihood" and "Impact"
+        likelihood_match = re.search(r'Likelihood\s*[:|-]?\s*(\d)', response_content, re.IGNORECASE)
+        impact_match = re.search(r'Impact\s*[:|-]?\s*(\d)', response_content, re.IGNORECASE)
+        # If both matches are found, return the extracted values
+        if likelihood_match and impact_match:
+            likelihood = int(likelihood_match.group(1))
+            impact = int(impact_match.group(1))
+            print(f"Extracted Likelihood: {likelihood}, Impact: {impact}")
+            return likelihood, impact
+        
+    except Exception:
+        pass
+    return likelihood, impact  # Fallback values
+
+async def update_tva_mapping():
     threats = fetch_threat_data()
-    risk_results = []
-
-    for asset_id, threat_name, vulnerability_description in threats:
-        likelihood, impact = assign_likelihood_impact(threat_name + " " + vulnerability_description)
-        risk_score = likelihood * impact  # Risk Score = L * I
-        risk_results.append((asset_id, threat_name, likelihood, impact, risk_score))
-
-    return risk_results
-
-# Save risk scores to database
-def save_risk_scores():
     conn = get_db_connection()
     cursor = conn.cursor()
-    risk_data = calculate_risk_scores()
 
-    for asset_id, threat_name, likelihood, impact, risk_score in risk_data:
+    for tva_id, asset_id, threat_name, vulnerability_description in threats:
+        likelihood, impact = await assign_likelihood_impact(threat_name + " " + vulnerability_description)
+        risk_score = likelihood * impact  # Risk Score = L * I
+
         cursor.execute(
-            "INSERT INTO risk_scores (asset_id, threat_name, likelihood, impact, risk_score) VALUES (%s, %s, %s, %s, %s) ON CONFLICT (asset_id, threat_name) DO UPDATE SET likelihood = EXCLUDED.likelihood, impact = EXCLUDED.impact, risk_score = EXCLUDED.risk_score;",
-            (asset_id, threat_name, likelihood, impact, risk_score)
+            """
+            UPDATE tva_mapping
+            SET likelihood = %s, impact = %s, risk_score = %s
+            WHERE id = %s;
+            """,
+            (likelihood, impact, risk_score, tva_id)
         )
 
     conn.commit()
     conn.close()
-    print("Risk scores updated successfully!")
+    print("Risk scores updated successfully in tva_mapping!")
 
-# Run the risk assessment logic
 if __name__ == "__main__":
-    save_risk_scores()
+    asyncio.run(update_tva_mapping())
