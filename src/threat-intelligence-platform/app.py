@@ -2,8 +2,8 @@ from flask import Flask, request, jsonify, send_from_directory
 import requests
 from flask_cors import CORS
 import psycopg2
-import os
-import logging
+from mitigation_recommendations import update_recommendations
+
 
 app = Flask(__name__, static_folder="threat-dashboard/build", static_url_path="")
 CORS(app)  # Allow frontend to access API
@@ -14,9 +14,9 @@ def get_db_connection():
         conn = psycopg2.connect(
             dbname="defaultdb", 
             user="doadmin", 
-            password="***************",
+            password="***********",
             port = "25060", 
-            host="******************",
+            host="**********8",
             sslmode="require"  # Ensures secure connection
         )
         return conn
@@ -70,9 +70,9 @@ def get_threats_data():
         return jsonify({"error": "Failed to connect to the database"}), 500
 
     cursor = conn.cursor()
-    cursor.execute("SELECT ip_address, ports, services FROM threat_data")
+    cursor.execute("SELECT ip_address, ports, services, threat_type FROM threat_data")
     threats_data = [
-        {"ip_address": row[0], "ports": row[1], "services": row[2]}
+        {"ip_address": row[0], "ports": row[1], "services": row[2], "Threat": row[3]}
         for row in cursor.fetchall()
     ]
     
@@ -99,7 +99,40 @@ def get_high_risk_threats():
 
     except Exception as e:
         return jsonify({"error": f"Internal processing error: {str(e)}"}), 500
+    
+@app.route('/api/mitigation-strategies', methods=['GET'])
+def get_mitigation_strategies():
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({"error": "Failed to connect to the database"}), 500
 
+        cursor = conn.cursor()
+
+        # Query to join 'tva_mapping' and 'mitigation_strategies' tables to get threats and their associated strategies
+        cursor.execute("""
+                        SELECT 
+                            t.threat_name,
+                            ms.mitigation_strategy AS mitigation_strategy
+                        FROM 
+                            mitigation_strategies ms
+                        JOIN 
+                            tva_mapping t ON ms.tva_mapping_id = t.id;
+        """)
+        
+        # Fetch the data from the query and format it into a list of dictionaries
+        mitigation_data = [
+            {"threat": row[0], "strategies": row[1]}
+            for row in cursor.fetchall()
+        ]
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(mitigation_data)
+    except Exception as e:
+        return jsonify({"error": f"Internal processing error: {str(e)}"}), 500
+  
 # Serve static files (JS, CSS, images, etc.)
 @app.route('/<path:path>')
 def serve_static_files(path):
@@ -107,3 +140,4 @@ def serve_static_files(path):
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
