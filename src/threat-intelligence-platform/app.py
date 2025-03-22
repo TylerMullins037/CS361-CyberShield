@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, send_from_directory
 import requests
 from flask_cors import CORS
 import psycopg2
-from mitigation_recommendations import update_recommendations
 
 
 app = Flask(__name__, static_folder="threat-dashboard/build", static_url_path="")
@@ -14,9 +13,9 @@ def get_db_connection():
         conn = psycopg2.connect(
             dbname="defaultdb", 
             user="doadmin", 
-            password="***********",
+            password="**********",
             port = "25060", 
-            host="**********8",
+            host="************",
             sslmode="require"  # Ensures secure connection
         )
         return conn
@@ -84,21 +83,40 @@ def get_threats_data():
 @app.route('/api/high_risk_threats', methods=['GET'])
 def get_high_risk_threats():
     try:
-        # Internal API call to fetch all threats
-        response = requests.get("http://127.0.0.1:5000/api/threats")
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({"error": "Failed to connect to the database"}), 500
+
+        cursor = conn.cursor()
+
+        # Query to join 'tva_mapping' and 'mitigation_strategies' tables to get threats and their associated strategies
+        cursor.execute("""
+                        SELECT 
+                            t.threat_name,
+                            t.risk_score,
+                            ms.mitigation_strategy AS mitigation_strategy
+                        FROM 
+                            tva_mapping t
+                        JOIN 
+                            mitigation_strategies ms ON ms.tva_mapping_id = t.id
+                        WHERE
+                            t.risk_score > 10;
+        """)
         
-        if response.status_code != 200:
-            return jsonify({"error": "Failed to retrieve threats from API"}), 500
-
-        threats = response.json()
-
-        # Filter threats with risk score > 20
-        high_risk_threats = [threat for threat in threats if threat["risk_score"] > 19]
-
-        return jsonify(high_risk_threats)
-
+        # Fetch the data from the query and format it into a list of dictionaries
+        mitigation_data = [
+            {"threat": row[0], "risk_score": row[1], "strategies": row[2]}
+            for row in cursor.fetchall()
+        ]
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(mitigation_data)
     except Exception as e:
         return jsonify({"error": f"Internal processing error: {str(e)}"}), 500
+  
+    
     
 @app.route('/api/mitigation-strategies', methods=['GET'])
 def get_mitigation_strategies():
