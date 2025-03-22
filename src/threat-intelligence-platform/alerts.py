@@ -26,7 +26,7 @@ if not os.path.exists(ALERTS_FILE):
     with open(ALERTS_FILE, "w") as f:
         json.dump([], f)
 
-def send_email_alert(threat, risk_score):
+def send_email_alert(threat, risk_score, mitigation_strategies):
     sender_email = os.getenv("ALERT_SENDER_EMAIL")
     receiver_email = os.getenv("ALERT_RECEIVER_EMAIL")
     smtp_server = os.getenv("SMTP_SERVER")
@@ -40,7 +40,7 @@ def send_email_alert(threat, risk_score):
         print(f"Missing: {' '.join([k for k, v in {'ALERT_SENDER_EMAIL': sender_email, 'ALERT_RECEIVER_EMAIL': receiver_email, 'SMTP_SERVER': smtp_server, 'SMTP_USER': smtp_user, 'SMTP_PASSWORD': smtp_password}.items() if not v])}")
         return False
 
-    msg = MIMEText(f"⚠️ High-Risk Threat Detected: {threat} with Risk Score {risk_score}")
+    msg = MIMEText(f"⚠️ High-Risk Threat Detected: {threat} with Risk Score {risk_score}. \n Here are some ways to mitigate this threat: \n {mitigation_strategies}")
     msg["Subject"] = "🚨 Critical Cybersecurity Alert 🚨"
     msg["From"] = sender_email
     msg["To"] = receiver_email
@@ -61,7 +61,7 @@ def send_email_alert(threat, risk_score):
         traceback.print_exc()  # Print full stack trace
         return False
 
-def send_webhook_alert(threat, risk_score):
+def send_webhook_alert(threat, risk_score, mitigation_strategies):
     webhook_url = os.getenv("WEBHOOK_URL")
     if not webhook_url:
         print("❌ Webhook URL not configured.")
@@ -118,14 +118,15 @@ def fetch_and_alert():
         print(f"Previously alerted threats: {alerted_threats}")
         
         for threat in threats:
-            threat_name = threat["name"]
+            threat_name = threat["threat"]
             risk_score = threat["risk_score"]
+            mitigation_strategy =threat["strategies"]
             
             # Only alert if this threat hasn't been sent before
             if threat_name not in alerted_threats:
                 print(f"New threat detected: {threat_name} with score {risk_score}")
-                email_sent = send_email_alert(threat_name, risk_score)
-                webhook_sent = send_webhook_alert(threat_name, risk_score)
+                email_sent = send_email_alert(threat_name, risk_score, mitigation_strategy)
+                webhook_sent = send_webhook_alert(threat_name, risk_score,mitigation_strategy)
                 
                 if email_sent or webhook_sent:
                     alerted_threats.append(threat_name)
