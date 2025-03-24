@@ -1,19 +1,11 @@
 import requests
 from psycopg2 import Error
 import psycopg2
-
-API_KEY = "*****************"
-IP = "8.8.8.8"  # You can also use a file hash instead of an IP
-URL = f"https://www.virustotal.com/api/v3/ip_addresses/{IP}"
-
-headers = {
-    "x-apikey": API_KEY
-}
-
-response = requests.get(URL, headers=headers)
+from risk_prioritization import RiskPrioritizationModel
 
 def scan_domain_virustotal(domain, api_key):
-    """Scan domain using VirusTotal API and store results in PostgreSQL"""
+    """Scan domain using VirusTotal API and store results in PostgreSQL
+    using riskPrioritization method"""
     try:
         URL = f"https://www.virustotal.com/api/v3/domains/{domain}"
 
@@ -46,6 +38,15 @@ def scan_domain_virustotal(domain, api_key):
             ports = attributes.get("network", {}).get("ports", [])
             services = attributes.get("categories", [])  #list of detected catagories
 
+            #extract threats score for virus total
+            statistics = attributes.get("last_analysis_stas", {})
+            count_of_malicious_activity = statistics.get("malicious", 0)
+            suspicious_count = statistics.get("suspicious", 0)
+
+            #determine threat type
+            threat_type = determine_threat_type(count_of_malicious_activity, suspicious_count)
+
+
             #convert them for the SQL format
             subdomains_str = "{" + ",".join(f'"{s}"' for s in subdomains) + "}" if subdomains else "{}"
             dns_records_str = "{" + ",".join(f'"{d}"' for d in dns_records) + "}" if dns_records else "{}"
@@ -56,9 +57,9 @@ def scan_domain_virustotal(domain, api_key):
             db_configuration = {
                 "dbname": "defaultdb",
                 "user": "doadmin",
-                "host": "*********",
+                "host": "***********",
                 "port": "25060",
-                "password": "*********"
+                "password": "***********"
             }
 
             # insert information into the database
@@ -67,13 +68,14 @@ def scan_domain_virustotal(domain, api_key):
                     with conn.cursor() as cursor:
                         cursor.execute(
                             """
-                            INSERT INTO threat_data (ip_address, ports, services, domain_name, subdomains, dns_record)
-                            VALUES (%s, %s, %s, %s, %s, %s)
+                            INSERT INTO threat_data (ip_address, ports, services, domain_name, subdomains, dns_record,threat_type)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s)
                             """,
-                            (ip_address[:45], ports_str, services_str, domain_name[:100], subdomains_str, dns_records_str)
+                            (ip_address[:45], ports_str, services_str, domain_name[:100], subdomains_str,
+                             dns_records_str, threat_type)
                         )
                         conn.commit()  # Commit transaction
-                        print(f"✅ Data for domain {domain_name} inserted successfully.")
+                        print(f" Data for domain {domain_name} inserted successfully.")
             except Error as db_error:
                 print(f"Database Error: {db_error}")
 
@@ -82,8 +84,16 @@ def scan_domain_virustotal(domain, api_key):
 
     except Exception as e:
         print(f" General Error: {e}")
+def determine_threat_type(malicious_count, suspicious_count):
+    """Determining the threat level based on virus total statistcis analysis"""
+    if malicious_count >= 5:
+        return "High Risk - Multiple malicious reports"
+    elif 1 <= malicious_count < 5 or suspicious_count >= 3:
+        return "Medium Risk - Some Suspicious Activity"
+    else:
+        return "Low Risk - No Significant Threats Detected"
 
 if __name__ == "__main__":
     domain = "jccc.edu"
-    key = "*****************"
+    key = "************"
     scan_domain_virustotal(domain, key)
