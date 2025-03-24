@@ -1,19 +1,31 @@
-
 import psycopg2
 import shodan
 import requests
 from time import sleep
+import logging
 
 
-SHODAN_API_KEY = "***********"
-SECURITY_TRAILS_API_KEY = "*************"
-VIRUS_TOTAL_API_KEY = "***********"
+SHODAN_API_KEY = "*********************"
+SECURITY_TRAILS_API_KEY = "****************"
+VIRUS_TOTAL_API_KEY = "*****************"
 
 
-DB_HOST = "**************"
+DB_HOST = "******************"
 DB_NAME = "defaultdb"
 DB_USER = "doadmin"
-DB_PASS = "**********"
+DB_PORT="25060"
+DB_PASS = "*********************"
+#configuring logging module to display message above Error, warning, Critical
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - % (levelname)s - % (message)s")
+
+#Testing for Database connection
+try:
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER,password=DB_PASS,
+                             host=DB_HOST, port=DB_PORT,sslmode="require")
+    print("The Database connected successfully.")
+    conn.close()
+except Exception as e:
+    print(f'Database connection failed: {e}')
 
 # Fetch data from Shodan
 def fetch_shodan_data(ip_address):
@@ -28,14 +40,14 @@ def fetch_shodan_data(ip_address):
 # Fetch data from SecurityTrails
 def fetch_security_data(domain):
     url = f"https://api.securitytrails.com/v1/domain/{domain}"
-    headers = {"APIKEY": SECURITY_TRAILS_API_KEY}
+    headers = {"API_KEY": SECURITY_TRAILS_API_KEY}
     response = requests.get(url, headers=headers)
     return response.json() if response.status_code == 200 else None
 
 # Fetch data from VirusTotal
 def fetch_virus_total_data(ip_address):
     url = f"https://www.virustotal.com/api/v3/ip_addresses/{ip_address}"
-    headers = {"x-apikey": VIRUS_TOTAL_API_KEY}
+    headers = {"virustotal-apikey": VIRUS_TOTAL_API_KEY}
     response = requests.get(url, headers=headers)
     return response.json() if response.status_code == 200 else None
 
@@ -43,9 +55,22 @@ def fetch_virus_total_data(ip_address):
 def store_threat_intelligence(threat_name, vulnerability, likelihood, impact, risk_score):
     try:
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS,
-                                host=DB_HOST,port="25060",
+                                host=DB_HOST,port=DB_PORT,
                                 sslmode="require")
         cursor = conn.cursor()
+
+        #checking if the table exits
+        cursor.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE "
+                       "table_name ='tva_mapping');")
+        #retrieve the next row
+        table_exists=cursor.fetchone()[0]
+
+        #check if the table exists
+        if not table_exists:
+            print("Table 'tva_mapping' does NOT exist! Please create it manually.")
+            return
+
+        print(f"Attempting to insert: {threat_name}, {vulnerability}, {likelihood}, {impact}, {risk_score}")
 
         # Insert data
         cursor.execute("""
@@ -53,23 +78,17 @@ def store_threat_intelligence(threat_name, vulnerability, likelihood, impact, ri
             VALUES (%s, %s, %s, %s, %s)
         """, (threat_name, vulnerability, likelihood, impact, risk_score))
         conn.commit()
-
-        # check for insertion
-        cursor.execute("SELECT * FROM tva_mapping WHERE threat_name = %s", (threat_name,))
-        rows = cursor.fetchall()
-        if rows:
-            print("Data inserted successfully:", rows)
-
+        print("Data was inserted successfuly")
         cursor.close()
         conn.close()
     except Exception as e:
         print(f"Error storing the data: {e}")
 
 # Main function
-def main():
+def fetch_osint_updates():
     print("Begin of the main function...")
-    domain = "google.com"
-    ip_address = "8.8.8.8"
+    domain = "jccc.edu"
+    ip_address = "3.14.155.216"
 
     # Fetch and process Shodan data
     shodan_data = fetch_shodan_data(ip_address)
@@ -108,9 +127,9 @@ def main():
                 risk_score=2 * 4
             )
 
+    logging.info("OSINT Threat data fetch complete")
 
-while True:
-    main()
-    print("Wait for for me please. I take a rest for 2 hours")
-    sleep(7200) 
 
+
+fetch_osint.py
+5 KB
