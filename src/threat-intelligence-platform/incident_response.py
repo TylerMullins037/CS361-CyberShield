@@ -7,8 +7,8 @@ def get_db_connection():
     return psycopg2.connect(
         dbname="defaultdb",
         user="doadmin",
-        password="************",
-        host="****************",
+        password="*************",
+        host="db-postgresql-nyc3-21525-do-user-20065838-0.k.db.ondigitalocean.com",
         port="25060"
     )
 
@@ -27,16 +27,15 @@ async def response_recommendation(threat_description):
             'role': 'system',
             'content': f""" 
             You are an expert in cybersecurity analysis. Please evaluate the following threat description based on current industry trends and standards. 
-            For the given threat, provide ONLY ONE recommended response plan to reduce or eliminate the risk associated with it. 
+            For the given threat, provide ONLY ONE ONLY ONE ONLY ONE ONLY ONE ONLY ONE ONLY ONE recommended response plan to reduce or eliminate the risk associated with it. 
             Your recommendations should focus on practical, actionable measures such as security controls, best practices, or industry standards. 
-            Consider factors such as the latest security frameworks, attack vectors, and relevant technology. 
+            Consider factors such as the latest security frameworks, attack vectors, and relevant technology. Link detected threats to NIST’s Incident Handling Guide (SP 800-61 Rev. 2)
             Please respond strictly in the following format: 'Response Plan: [one plan]'' where the plan is specific, clear, and focused on actionable solutions.
-            Threat: {threat_description}
+            Threat: {threat_description} 
             """
         }])
         # Get the raw response content
         response_content = response.get('message', {}).get('content', '')
-        print(response_content)
         match = re.search(r"Response Plan:\s*(.*)", response_content, re.DOTALL)
         
         if match:
@@ -65,7 +64,7 @@ async def update_recommendations():
         for bullet in response_bullets:
             cursor.execute(
                 """
-                INSERT INTO public.response_plan (tva_mapping_id, response_plan)
+                INSERT INTO public.incident_logs (tva_mapping_id, response_plan)
                 VALUES (%s, %s);
                 """,
                 (tva_id, recommendation)
