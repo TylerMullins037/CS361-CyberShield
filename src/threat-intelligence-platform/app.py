@@ -117,7 +117,42 @@ def get_high_risk_threats():
     except Exception as e:
         return jsonify({"error": f"Internal processing error: {str(e)}"}), 500
   
-    
+@app.route('/api/risk-trends', methods=['GET'])
+def get_risk_trends():
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({"error": "Failed to connect to the database"}), 500
+
+        cursor = conn.cursor()
+
+        # Query to join 'tva_mapping' and 'mitigation_strategies' tables to get threats and their associated strategies
+        cursor.execute("""
+                              SELECT 
+        DATE(alert_date) as date,
+        COUNT(*) as count
+      FROM 
+        alert_logs
+      GROUP BY 
+        DATE(alert_date)
+      ORDER BY 
+        date ASC;
+    ;
+        """)
+        
+        # Fetch the data from the query and format it into a list of dictionaries
+        risk_trends = [
+            {"date": row[0], "count": row[1]}
+            for row in cursor.fetchall()
+        ]
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(risk_trends)
+    except Exception as e:
+        return jsonify({"error": f"Internal processing error: {str(e)}"}), 500
+  
     
 @app.route('/api/mitigation-strategies', methods=['GET'])
 def get_mitigation_strategies():
