@@ -13,9 +13,9 @@ def get_db_connection():
         conn = psycopg2.connect(
             dbname="defaultdb", 
             user="doadmin", 
-            password="**********",
+            password="",
             port = "25060", 
-            host="************",
+            host="db-postgresql-nyc3-21525-do-user-20065838-0.k.db.ondigitalocean.com",
             sslmode="require"  # Ensures secure connection
         )
         return conn
@@ -53,9 +53,9 @@ def get_threats():
     if conn is None:
         return jsonify({"error": "Failed to connect to the database"}), 500
     cursor = conn.cursor()
-    cursor.execute("SELECT threat_name, vulnerability_description, likelihood, impact, likelihood * impact AS risk_score FROM tva_mapping")
+    cursor.execute("SELECT threat_name, vulnerability_description, likelihood, impact, likelihood * impact AS risk_score, date FROM tva_mapping")
     threats = [
-        {"name": row[0], "vulnerability": row[1], "likelihood": row[2], "impact": row[3], "risk_score": row[4]}
+        {"name": row[0], "vulnerability": row[1], "likelihood": row[2], "impact": row[3], "risk_score": row[4], "date": row[5]}
         for row in cursor.fetchall()
     ]
     cursor.close()
@@ -94,7 +94,8 @@ def get_high_risk_threats():
                         SELECT 
                             t.threat_name,
                             t.risk_score,
-                            ms.mitigation_strategy AS mitigation_strategy
+                            ms.mitigation_strategy AS mitigation_strategy,
+                            ms.tva_mapping_id
                         FROM 
                             tva_mapping t
                         JOIN 
@@ -105,7 +106,7 @@ def get_high_risk_threats():
         
         # Fetch the data from the query and format it into a list of dictionaries
         mitigation_data = [
-            {"threat": row[0], "risk_score": row[1], "strategies": row[2]}
+            {"threat": row[0], "risk_score": row[1], "strategies": row[2], "id": row[3]}
             for row in cursor.fetchall()
         ]
         
@@ -151,6 +152,16 @@ def get_mitigation_strategies():
     except Exception as e:
         return jsonify({"error": f"Internal processing error: {str(e)}"}), 500
   
+@app.route('/webhook-handler', methods=['POST'])
+def handle_webhook():
+    data = request.json
+    print(f"Received Webhook: {data}")  # Log the data for debugging
+
+    # Process the data (e.g., alert admin, update database, etc.)
+    
+    return jsonify({"status": "success"}), 200  # Respond to sender
+
+
 # Serve static files (JS, CSS, images, etc.)
 @app.route('/<path:path>')
 def serve_static_files(path):
@@ -158,4 +169,3 @@ def serve_static_files(path):
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
-
