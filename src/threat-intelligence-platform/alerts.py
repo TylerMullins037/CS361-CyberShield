@@ -3,8 +3,26 @@ import requests
 import os
 import json
 import traceback
+import hashlib
+import hmac
+import psycopg2
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
+
+def get_db_connection():
+    try:
+        conn = psycopg2.connect(
+            dbname="defaultdb", 
+            user="doadmin", 
+            password="",
+            port = "25060", 
+            host="db-postgresql-nyc3-21525-do-user-20065838-0.k.db.ondigitalocean.com",
+            sslmode="require"  # Ensures secure connection
+        )
+        return conn
+    except Exception as e:
+        print(f"Database connection error: {e}")
+        return None
 
 # Load environment variables from .env file
 load_dotenv("threat-backend/.env")
@@ -63,15 +81,27 @@ def send_email_alert(threat, risk_score, mitigation_strategies):
 
 def send_webhook_alert(threat, risk_score, mitigation_strategies):
     webhook_url = os.getenv("WEBHOOK_URL")
+    webhook_token = os.getenv("WEBHOOK_TOKEN")
     if not webhook_url:
         print("❌ Webhook URL not configured.")
         return False
     
     data = {"threat": threat, "risk_score": risk_score, "message": "⚠️ High-Risk Threat Detected"}
+    json_data = json.dumps(data)
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {webhook_token}"  # Adjust if GitHub requires a different format
+    }
+    
     try:
         print(f"Sending webhook to {webhook_url}...")
-        response = requests.post(webhook_url, json=data)
-        if response.status_code == 200:
+        response = requests.post(webhook_url, json=data, headers=headers)
+
+        print(f"📩 Webhook Response: {response.status_code}")
+        print(f"📩 Response Body: {response.text}")
+
+        if response.status_code in [200, 201, 204]:
             print(f"✅ Webhook alert sent for {threat}")
             return True
         else:
@@ -121,6 +151,7 @@ def fetch_and_alert():
             threat_name = threat["threat"]
             risk_score = threat["risk_score"]
             mitigation_strategy =threat["strategies"]
+            id = threat["id"]
             
             # Only alert if this threat hasn't been sent before
             if threat_name not in alerted_threats:
@@ -129,6 +160,7 @@ def fetch_and_alert():
                 webhook_sent = send_webhook_alert(threat_name, risk_score,mitigation_strategy)
                 
                 if email_sent or webhook_sent:
+                    log_alert_in_db(threat_name, risk_score, mitigation_strategy,id)
                     alerted_threats.append(threat_name)
                     save_alerted_threats(alerted_threats)
             else:
@@ -136,6 +168,28 @@ def fetch_and_alert():
     except Exception as e:
         print(f"⚠️ Error in fetching and alerting: {e}")
         traceback.print_exc()
+
+def log_alert_in_db(threat, risk_score, mitigation_strategy,id):
+    conn = get_db_connection()
+    if not conn:
+        print("⚠️ Skipping database logging due to connection failure.")
+        return
+
+    try:
+        with conn.cursor() as cur:
+            alert_log_message = f"Threat: {threat}, Risk Score: {risk_score}, Mitigation: {mitigation_strategy}"
+            cur.execute(
+                "INSERT INTO alert_logs (tva_mapping_id, alert_log) VALUES (%s, %s)",
+                (id, alert_log_message)  # Adjust `tva_mapping_id` accordingly
+            )
+            conn.commit()
+            print(f"✅ Alert logged in database: {threat}")
+    except Exception as e:
+        print(f"❌ Error inserting alert log into database: {e}")
+        traceback.print_exc()
+    finally:
+        conn.close()
+
 
 def test_email_connection():
     """Test the email connection without sending an actual alert"""
