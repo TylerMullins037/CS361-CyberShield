@@ -3,20 +3,23 @@ import shodan
 import requests
 from time import sleep
 import logging
+import Shodan
+
+IP_ADDRESS  = "8.8.8.8"
+api_keys = Shodan.API_KEY
+
+SECURITY_TRAILS_API_KEY = "**********"
+VIRUS_TOTAL_API_KEY = "************"
 
 
-SHODAN_API_KEY = "*********************"
-SECURITY_TRAILS_API_KEY = "****************"
-VIRUS_TOTAL_API_KEY = "*****************"
-
-
-DB_HOST = "******************"
+DB_HOST = "db-postgresql-nyc3-21525-do-user-20065838-0.k.db.ondigitalocean.com"
 DB_NAME = "defaultdb"
 DB_USER = "doadmin"
 DB_PORT="25060"
-DB_PASS = "*********************"
+DB_PASS = "************8"
 #configuring logging module to display message above Error, warning, Critical
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - % (levelname)s - % (message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 #Testing for Database connection
 try:
@@ -30,7 +33,7 @@ except Exception as e:
 # Fetch data from Shodan
 def fetch_shodan_data(ip_address):
     try:
-        api = shodan.Shodan(SHODAN_API_KEY)
+        api = shodan.Shodan(api_keys)
         response = api.host(ip_address)  # Fetch data for the ip address
         return response
     except shodan.APIError as e:
@@ -85,13 +88,13 @@ def store_threat_intelligence(threat_name, vulnerability, likelihood, impact, ri
         print(f"Error storing the data: {e}")
 
 # Main function
-def fetch_osint_updates():
+def fetch_osint_updates(ip):
     print("Begin of the main function...")
-    domain = "jccc.edu"
-    ip_address = "3.14.155.216"
+    domain = "google.com"
+
 
     # Fetch and process Shodan data
-    shodan_data = fetch_shodan_data(ip_address)
+    shodan_data = fetch_shodan_data(ip)
     if shodan_data:
         ports = shodan_data.get("ports", [])
         store_threat_intelligence(
@@ -103,7 +106,7 @@ def fetch_osint_updates():
         )
 
     # Fetch and process VirusTotal data
-    virus_data = fetch_virus_total_data(ip_address)
+    virus_data = fetch_virus_total_data(ip)
     if virus_data and "data" in virus_data:
         attributes = virus_data["data"]["attributes"]
         threat_score = attributes.get("reputation", "N/A")
@@ -128,8 +131,3 @@ def fetch_osint_updates():
             )
 
     logging.info("OSINT Threat data fetch complete")
-
-
-
-fetch_osint.py
-5 KB
