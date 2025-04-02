@@ -26,13 +26,16 @@ import {
   createTheme,
   CssBaseline,
 } from "@mui/material";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LineChart, Line, Legend, PieChart, Pie } from "recharts";
 import SecurityIcon from '@mui/icons-material/Security';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import WarningIcon from '@mui/icons-material/Warning';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import StorageIcon from '@mui/icons-material/Storage';
 import ShieldIcon from '@mui/icons-material/Shield';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import TimelineIcon from '@mui/icons-material/Timeline';
 
 // Custom theme
 const darkTheme = createTheme({
@@ -112,6 +115,12 @@ const fetchMitigations = async () => {
   return await response.json();
 };
 
+// New API function for risk trends
+const fetchRiskTrends = async () => {
+  const response = await fetch("http://localhost:5000/api/risk-trends");
+  return await response.json();
+};
+
 // Risk score color mapping
 const getRiskColor = (score) => {
   if (score >= 20) return '#f44336'; // High risk - red
@@ -136,6 +145,12 @@ export default function ThreatDashboard() {
   const [filterRisk, setFilterRisk] = useState("");
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  
+  // New state variables for enhanced filtering and risk trends
+  const [riskTrends, setRiskTrends] = useState([]);
+  const [filterSeverity, setFilterSeverity] = useState("");
+  const [filterImpactLevel, setFilterImpactLevel] = useState("");
+  const [filterThreatType, setFilterThreatType] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -145,11 +160,13 @@ export default function ThreatDashboard() {
         const threatsData = await fetchThreats();
         const threatDataResults = await fetchThreatData();
         const mitigationsData = await fetchMitigations();
+        const riskTrendsData = await fetchRiskTrends(); // New data fetch
         
         setAssets(assetsData);
         setThreats(threatsData);
         setThreatData(threatDataResults);
         setMitigations(mitigationsData);
+        setRiskTrends(riskTrendsData); // Set the new data
         setLastUpdated(new Date());
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -183,6 +200,7 @@ export default function ThreatDashboard() {
         setThreats(await fetchThreats());
         setThreatData(await fetchThreatData());
         setMitigations(await fetchMitigations());
+        setRiskTrends(await fetchRiskTrends()); // Add this line
         setLastUpdated(new Date());
       } catch (error) {
         console.error("Error refreshing data:", error);
@@ -194,8 +212,22 @@ export default function ThreatDashboard() {
     fetchData();
   };
 
+  // Get threat types from the threats data
+  const getThreatTypes = () => {
+    const types = [...new Set(threats.map(threat => threat.type || "Unclassified"))];
+    return types;
+  };
+
   const filteredAssets = assets.filter((asset) => !filterType || asset.asset_type === filterType);
-  const filteredThreats = threats.filter((threat) => !filterRisk || threat.risk_score >= filterRisk);
+  
+  // Enhanced threat filtering
+  const filteredThreats = threats.filter(
+    (threat) => 
+      (!filterRisk || threat.risk_score >= filterRisk) &&
+      (!filterSeverity || getRiskLevel(threat.risk_score) === filterSeverity) &&
+      (!filterImpactLevel || threat.impact === parseInt(filterImpactLevel)) &&
+      (!filterThreatType || threat.type === filterThreatType)
+  );
 
   // Get high risk threats count
   const highRiskCount = threats.filter(threat => threat.risk_score >= 20).length;
@@ -208,7 +240,7 @@ export default function ThreatDashboard() {
           <Toolbar>
             <SecurityIcon sx={{ mr: 2 }} />
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Enterprise Security Dashboard
+              ShopSmart Solutions Dashboard
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography variant="body2" sx={{ mr: 2 }}>
@@ -278,8 +310,130 @@ export default function ThreatDashboard() {
             </Grid>
           </Grid>
 
-          {/* Main Dashboard */}
+          {/* Enhanced Filtering Controls */}
           <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" component="div">
+                      <FilterListIcon sx={{ mr: 1, verticalAlign: 'bottom' }} />
+                      Enhanced Threat Filtering
+                    </Typography>
+                  </Box>
+                  <Divider sx={{ mb: 2 }} />
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <TextField
+                        select
+                        label="Filter by Severity"
+                        value={filterSeverity}
+                        onChange={(e) => setFilterSeverity(e.target.value)}
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                      >
+                        <MenuItem value="">All Severity Levels</MenuItem>
+                        <MenuItem value="High">High</MenuItem>
+                        <MenuItem value="Medium">Medium</MenuItem>
+                        <MenuItem value="Low">Low</MenuItem>
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <TextField
+                        select
+                        label="Filter by Impact"
+                        value={filterImpactLevel}
+                        onChange={(e) => setFilterImpactLevel(e.target.value)}
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                      >
+                        <MenuItem value="">All Impact Levels</MenuItem>
+                        <MenuItem value="5">Very High (5)</MenuItem>
+                        <MenuItem value="4">High (4)</MenuItem>
+                        <MenuItem value="3">Medium (3)</MenuItem>
+                        <MenuItem value="2">Low (2)</MenuItem>
+                        <MenuItem value="1">Very Low (1)</MenuItem>
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <TextField
+                        select
+                        label="Filter by Threat Type"
+                        value={filterThreatType}
+                        onChange={(e) => setFilterThreatType(e.target.value)}
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                      >
+                        <MenuItem value="">All Threat Types</MenuItem>
+                        {getThreatTypes().map((type) => (
+                          <MenuItem key={type} value={type}>{type}</MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <TextField
+                        label="Min Risk Score"
+                        type="number"
+                        value={filterRisk}
+                        onChange={(e) => setFilterRisk(e.target.value)}
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                      />
+                    </Grid>
+                  </Grid>
+                  
+                  {/* Filter Results Summary */}
+                  <Box sx={{ mt: 2, p: 2, backgroundColor: 'background.paper', borderRadius: 1 }}>
+                    <Typography variant="body2" color="textSecondary">
+                      Displaying {filteredThreats.length} out of {threats.length} threats based on current filters
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                      {filterSeverity && (
+                        <Chip 
+                          label={`Severity: ${filterSeverity}`} 
+                          onDelete={() => setFilterSeverity("")} 
+                          size="small" 
+                          color="primary" 
+                          variant="outlined"
+                        />
+                      )}
+                      {filterImpactLevel && (
+                        <Chip 
+                          label={`Impact: ${filterImpactLevel}`} 
+                          onDelete={() => setFilterImpactLevel("")} 
+                          size="small" 
+                          color="primary" 
+                          variant="outlined"
+                        />
+                      )}
+                      {filterThreatType && (
+                        <Chip 
+                          label={`Type: ${filterThreatType}`} 
+                          onDelete={() => setFilterThreatType("")} 
+                          size="small" 
+                          color="primary" 
+                          variant="outlined"
+                        />
+                      )}
+                      {filterRisk && (
+                        <Chip 
+                          label={`Min Risk: ${filterRisk}`} 
+                          onDelete={() => setFilterRisk("")} 
+                          size="small" 
+                          color="primary" 
+                          variant="outlined"
+                        />
+                      )}
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+
             {/* Asset Inventory */}
             <Grid item xs={12} md={6}>
               <Card>
@@ -374,14 +528,6 @@ export default function ThreatDashboard() {
                     <Typography variant="h6" component="div">
                       Threat Intelligence Overview
                     </Typography>
-                    <TextField
-                      label="Min Risk Score"
-                      type="number"
-                      value={filterRisk}
-                      onChange={(e) => setFilterRisk(e.target.value)}
-                      size="small"
-                      sx={{ width: 150 }}
-                    />
                   </Box>
                   <Divider sx={{ mb: 2 }} />
                   <Box sx={{ height: 300, overflow: 'auto' }}>
@@ -489,6 +635,80 @@ export default function ThreatDashboard() {
               </Card>
             </Grid>
 
+           {/* Risk Trends Chart */}
+<Grid item xs={12} md={6}>
+  <Card>
+    <CardContent>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6" component="div">
+          <TimelineIcon sx={{ mr: 1, verticalAlign: 'bottom' }} />
+          Risk Trend Analysis
+        </Typography>
+      </Box>
+      <Divider sx={{ mb: 2 }} />
+      <Box sx={{ height: 300 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={riskTrends}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" tickFormatter={(date) => new Date(date).toLocaleDateString()} />
+            <YAxis />
+            <Tooltip 
+              labelFormatter={(date) => new Date(date).toLocaleDateString()} 
+              formatter={(value) => [value + " threats", "Count"]} 
+            />
+            <Legend verticalAlign="top" height={36} />
+            <Bar 
+              dataKey="count" 
+              name="Threat Count" 
+              fill="#3f51b5" 
+              barSize={30} 
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </Box>
+    </CardContent>
+  </Card>
+</Grid>
+
+
+            {/* Threat Distribution Chart */}
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" component="div">
+                      <AssessmentIcon sx={{ mr: 1, verticalAlign: 'bottom' }} />
+                      Threat Distribution
+                    </Typography>
+                  </Box>
+                  <Divider sx={{ mb: 2 }} />
+                  <Box sx={{ height: 300 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { name: 'High Risk', value: threats.filter(t => getRiskLevel(t.risk_score) === 'High').length, fill: '#f44336' },
+                            { name: 'Medium Risk', value: threats.filter(t => getRiskLevel(t.risk_score) === 'Medium').length, fill: '#ff9800' },
+                            { name: 'Low Risk', value: threats.filter(t => getRiskLevel(t.risk_score) === 'Low').length, fill: '#4caf50' },
+                          ]}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={100}
+                          label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          labelLine={false}
+                          dataKey="value"
+                        />
+                        <Tooltip formatter={(value, name) => [`${value} threats`, name]} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+
             {/* Threat Data */}
             <Grid item xs={12} md={6}>
               <Card>
@@ -590,7 +810,7 @@ export default function ThreatDashboard() {
                       </Table>
                     </TableContainer>
                   </Box>
-                </CardContent>
+                  </CardContent>
               </Card>
             </Grid>
 
@@ -740,3 +960,4 @@ export default function ThreatDashboard() {
     </ThemeProvider>
   );
 }
+                
