@@ -2,6 +2,11 @@ from flask import Flask, request, jsonify, send_from_directory
 import requests
 from flask_cors import CORS
 import psycopg2
+from fpdf import FPDF
+import csv
+import os
+from datetime import datetime
+from report_generator import ThreatReport
 
 
 app = Flask(__name__, static_folder="threat-dashboard/build", static_url_path="")
@@ -13,7 +18,7 @@ def get_db_connection():
         conn = psycopg2.connect(
             dbname="defaultdb", 
             user="doadmin", 
-            password="",
+            password="******",
             port = "25060", 
             host="db-postgresql-nyc3-21525-do-user-20065838-0.k.db.ondigitalocean.com",
             sslmode="require"  # Ensures secure connection
@@ -196,6 +201,138 @@ def handle_webhook():
     
     return jsonify({"status": "success"}), 200  # Respond to sender
 
+
+
+# Add new routes to your Flask app:
+
+@app.route('/api/generate-pdf-report', methods=['GET'])
+def generate_pdf_report():
+    try:
+        # Get data from database
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({"error": "Failed to connect to the database"}), 500
+
+        cursor = conn.cursor()
+        
+        # Get threats
+        cursor.execute("SELECT threat_name, vulnerability_description, likelihood, impact, likelihood * impact AS risk_score, date FROM tva_mapping")
+        threats = [
+            {"name": row[0], "vulnerability": row[1], "likelihood": row[2], "impact": row[3], "risk_score": row[4], "date": row[5]}
+            for row in cursor.fetchall()
+        ]
+        
+        # Get mitigation strategies
+        cursor.execute("""
+            SELECT 
+                t.threat_name,
+                ms.mitigation_strategy AS mitigation_strategy
+            FROM 
+                mitigation_strategies ms
+            JOIN 
+                tva_mapping t ON ms.tva_mapping_id = t.id
+        """)
+        
+        mitigations = [
+            {"threat": row[0], "strategies": row[1]}
+            for row in cursor.fetchall()
+        ]
+        
+        # Create directory for reports if it doesn't exist
+        os.makedirs("reports", exist_ok=True)
+        
+        # Generate PDF
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        pdf_filename = f"reports/threat_report_{timestamp}.pdf"
+        
+        pdf = ThreatReport()
+        pdf.add_page()
+        
+        # Add timestamp
+        pdf.set_font("Arial", "I", 10)
+        pdf.cell(0, 10, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
+        pdf.ln(10)
+        
+        # Add threats section
+        pdf.add_section_title("Threat Assessment")
+        for threat in threats:
+            pdf.add_threat(
+                threat["name"], 
+                threat["risk_score"], 
+                threat["vulnerability"],
+                threat["likelihood"],
+                threat["impact"],
+                str(threat["date"]) if threat["date"] else None
+            )
+            
+        # Add new page for mitigation strategies
+        pdf.add_page()
+        pdf.add_section_title("Mitigation Strategies")
+        
+        for mitigation in mitigations:
+            pdf.add_mitigation(mitigation["threat"], mitigation["strategies"])
+        
+        pdf.output(pdf_filename)
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({"success": True, "file": pdf_filename})
+    
+    except Exception as e:
+        return jsonify({"error": f"Failed to generate PDF report: {str(e)}"}), 500
+
+@app.route('/api/generate-csv-report', methods=['GET'])
+def generate_csv_report():
+    try:
+        # Get data from database
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({"error": "Failed to connect to the database"}), 500
+
+        cursor = conn.cursor()
+        
+        # Get threats
+        cursor.execute("SELECT threat_name, vulnerability_description, likelihood, impact, likelihood * impact AS risk_score, date FROM tva_mapping")
+        threats = [
+            {"name": row[0], "vulnerability": row[1], "likelihood": row[2], "impact": row[3], "risk_score": row[4], "date": row[5]}
+            for row in cursor.fetchall()
+        ]
+        
+        # Create directory for reports if it doesn't exist
+        os.makedirs("reports", exist_ok=True)
+        
+        # Generate CSV
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        csv_filename = f"reports/threat_report_{timestamp}.csv"
+        
+        with open(csv_filename, 'w', newline='') as csvfile:
+            fieldnames = ['Threat', 'Vulnerability', 'Likelihood', 'Impact', 'Risk Score', 'Date']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            
+            writer.writeheader()
+            for threat in threats:
+                writer.writerow({
+                    'Threat': threat["name"],
+                    'Vulnerability': threat["vulnerability"],
+                    'Likelihood': threat["likelihood"],
+                    'Impact': threat["impact"],
+                    'Risk Score': threat["risk_score"],
+                    'Date': threat["date"]
+                })
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({"success": True, "file": csv_filename})
+    
+    except Exception as e:
+        return jsonify({"error": f"Failed to generate CSV report: {str(e)}"}), 500
+
+# Add a route to download generated reports
+@app.route('/reports/<path:filename>', methods=['GET'])
+def download_report(filename):
+    return send_from_directory('reports', filename)
 
 # Serve static files (JS, CSS, images, etc.)
 @app.route('/<path:path>')
