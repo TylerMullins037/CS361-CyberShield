@@ -1,0 +1,37 @@
+from datetime import datetime, timezone, date
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+def forecast_risk(trend_data):
+    """
+    trend_data: List of (day_index, risk_score) over time.
+    Returns predicted risk score for the next day.
+    """
+    if len(trend_data) < 2:
+        return trend_data[-1][1] if trend_data else 0
+
+    X = np.array([t[0] for t in trend_data]).reshape(-1, 1)
+    y = np.array([t[1] for t in trend_data])
+
+    model = LinearRegression()
+    model.fit(X, y)
+
+    next_day = np.array([[max(X)[0] + 1]])
+    predicted_score = model.predict(next_day)[0]
+    return predicted_score
+
+async def time_weighted_score(base_score, threat_date):
+    print(type(threat_date))
+    if isinstance(threat_date, datetime):
+        last_seen = threat_date
+    elif isinstance(threat_date, date):  # Change this line
+        last_seen = datetime(threat_date.year, threat_date.month, threat_date.day, tzinfo=timezone.utc)
+    else:
+        raise ValueError("Invalid threat_date type: must be a datetime or date object.")
+    days_ago = (datetime.now(timezone.utc) - last_seen).days
+    if days_ago > 14:
+        return base_score * 0.5  # Significant time decay
+    elif days_ago > 7:
+        return base_score * 0.75  # Moderate time decay
+
+    return base_score  # No time decay if recent
