@@ -25,6 +25,8 @@ import {
   ThemeProvider,
   createTheme,
   CssBaseline,
+  Button,
+  Stack,
 } from "@mui/material";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LineChart, Line, Legend, PieChart, Pie } from "recharts";
 import SecurityIcon from '@mui/icons-material/Security';
@@ -36,6 +38,8 @@ import ShieldIcon from '@mui/icons-material/Shield';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import TimelineIcon from '@mui/icons-material/Timeline';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
 // Custom theme
 const darkTheme = createTheme({
@@ -252,6 +256,58 @@ export default function ThreatDashboard() {
             </Box>
           </Toolbar>
         </AppBar>
+        
+        {/* Report Generation Buttons */}
+        <Box sx={{ backgroundColor: 'background.paper', p: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }}>
+          <Container maxWidth="xl">
+            <Stack 
+              direction="row" 
+              spacing={2} 
+              justifyContent="flex-end" 
+              alignItems="center"
+            >
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<FileDownloadIcon />}
+                onClick={() => {
+                  fetch('http://localhost:5000/api/generate-csv-report')
+                    .then(response => response.json())
+                    .then(data => {
+                      if (data.success) {
+                        window.location.href = `http://localhost:5000/${data.file}`;
+                      } else {
+                        console.error(data.error);
+                        // You might want to display an error message to the user
+                      }
+                    });
+                }}
+                
+              >
+                Export CSV Report
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<PictureAsPdfIcon />}
+                onClick={() => {
+                  fetch('http://localhost:5000/api/generate-pdf-report')
+                    .then(response => response.json())
+                    .then(data => {
+                      if (data.success) {
+                        window.location.href = `http://localhost:5000/${data.file}`;
+                      } else {
+                        console.error(data.error);
+                        // You might want to display an error message to the user
+                      }
+                    });
+                }}
+              >
+                Generate PDF Report
+              </Button>
+            </Stack>
+          </Container>
+        </Box>
         
         <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
           {/* Overview Cards */}
@@ -777,8 +833,7 @@ export default function ThreatDashboard() {
                                 </TableCell>
                                 <TableCell>
                                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {Array.isArray(threats_data.services) ? 
-                                      threats_data.services.map((service, i) => (
+                                    {Array.isArray(threats_data.services) ? threats_data.services.map((service, i) => (
                                         <Chip 
                                           key={i}
                                           label={service} 
@@ -960,4 +1015,3 @@ export default function ThreatDashboard() {
     </ThemeProvider>
   );
 }
-                
