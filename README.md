@@ -11,7 +11,64 @@ NIST Cybersecurity Framework (CSF) 2.0.
 -----------------------------------------------------------------------------------------
 
 
-# 🗓️ Week 6 Real-Time Risk Alerts, Incident Response, and Cost-Benefit Analysis for Risk Treatment (26 – 30 March 2025)
+# 🗓️ Week 7 Fine-Tuning Risk Scoring, Threat Report Generation, and Security Audits (10 April 2025)
+
+## Focus:
+Refining the risk scoring model, developing comprehensive threat report generation features, conducting initial security audits, and optimizing data logging and database performance.
+
+---
+
+## 🔍 Overview
+In Week 7, the team focused on fine-tuning the risk scoring system by incorporating real-time threat intelligence, automating threat report generation, and conducting initial security audits to identify vulnerabilities. Data logging for threat events was optimized for better forensic tracking, and database performance was enhanced to handle large datasets effectively.
+
+---
+
+## ✅ Tasks Completed
+
+### 📊 1. Fine-Tuning Risk Scoring Based on Threat Intelligence Trends
+- Updated the risk scoring model to reflect real-time threat intelligence trends.
+- Incorporated machine learning-based trend analysis for forecasting future risks.
+- Implemented time-weighted risk scoring to prioritize current, active threats.
+
+### 📑 2. Developing a Comprehensive Threat Report Generation Feature
+- Automated the generation of PDF/CSV reports summarizing risk assessments and incidents.
+- Included detailed threat intelligence summaries, risk scores, and mitigation plans for each report.
+
+### 🛠️ 3. Conducting Initial Security Audits
+- Performed penetration testing using OWASP ZAP, Nmap, and Burp Suite.
+- Identified vulnerabilities, misconfigurations, and security weaknesses within the system.
+- Documented findings and provided recommendations for mitigation.
+
+### 📝 4. Optimizing Data Logging & Threat Event Tracking
+- Implemented structured logging for detailed tracking of each security event.
+- Improved logging performance with log rotation to prevent bottlenecks during high activity.
+
+### ⚙️ 5. Ensuring Database Integrity & Performance Optimization
+- Optimized SQL queries and added indexing to improve query performance.
+- Developed and tested backup and restore procedures to ensure database integrity.
+
+---
+
+## 📂 Files Added/Updated
+
+| File/Directory                         | Description                                    |
+|----------------------------------------|------------------------------------------------|
+| `/src/threat-intelligence-platform/risk_scoring.py`                 | Updated risk scoring model with real-time intelligence |
+| `/src/threat-intelligence-platform/report_generator.py`             | Automated threat report generation system     |
+| `/docs/security_audit.md`              | Security audit report with findings and recommendations |
+| `/src/threat-intelligence-platform/logging.py`                      | Threat event logging system                    |
+| `/db/optimized_queries.sql`            | Optimized SQL queries for performance         |
+
+---
+
+📌 All Deliverables Submitted: **8 April 2025**
+
+
+
+-----------------------------------------------------------------------------------------
+
+
+# 🗓️ Week 6 Real-Time Risk Alerts, Incident Response, and Cost-Benefit Analysis for Risk Treatment (5 April 2025)
 
 ## Focus:
 Implementing real-time risk alerts, building incident response workflows, integrating cost-benefit analysis for risk treatment, enhancing the threat intelligence dashboard with risk trends, and optimizing system performance.
@@ -56,23 +113,23 @@ In Week 6, the team focused on implementing a robust alerting system for high-ri
 
 | File/Directory                         | Description                                    |
 |----------------------------------------|------------------------------------------------|
-| `/src/alerts.py`                       | Real-time alert system for high-risk threats   |
-| `/db/alerts.sql`                       | Database schema for alert logs                 |
-| `/src/incident_response.py`            | Incident response mechanism with countermeasures|
+| `/src/threat-intelligence-platform/alerts.py`                       | Real-time alert system for high-risk threats   |
+| `/db/alert_logs.sql`                       | Database schema for alert logs                 |
+| `/src/threat-intelligence-platform/incident_response.py`            | Incident response mechanism with countermeasures|
 | `/db/incident_logs.sql`                | Incident handling logs schema                  |
-| `/src/cba_analysis.py`                 | CBA automation script for risk treatment       |
-| `/src/components/Dashboard.js`        | Enhanced threat intelligence dashboard UI      |
-| `/src/api_optimizer.py`                | API optimization and caching improvements      |
+| `/src/threat-intelligence-platform/cba_analysis.py`                 | CBA automation script for risk treatment       |
+| `/src/threat-dashboard/src/components/Dashboard.js`        | Enhanced threat intelligence dashboard UI      |
+| `/api/api_optimizer.py`                | API optimization and caching improvements      |
 
 ---
 
-📌 All Deliverables Submitted by: **30 March 2025**
+📌 All Deliverables Submitted: **2 April 2025**
 
 
 -----------------------------------------------------------------------------------------
 
 
-# 🗓️ Week 5 Risk Analysis, Automated Risk Scoring, and Threat Mitigation Planning (19 – 23 March 2025)
+# 🗓️ Week 5 Risk Analysis, Automated Risk Scoring, and Threat Mitigation Planning (1 April 2025)
 
 ## Focus:
 Enhancing risk scoring using machine learning (LLM), refining TVA mapping, developing dynamic risk prioritization models, and automating risk mitigation recommendations.
@@ -112,17 +169,19 @@ In Week 5, the team advanced the platform by incorporating machine learning mode
 
 | File/Directory                        | Description                                             |
 |---------------------------------------|---------------------------------------------------------|
-| `/src/risk_analysis.py`               | LLM-based risk scoring script                           |
+| `/src/threat-intelligence-platform/risk_analysis.py`               | LLM-based risk scoring script                           |
 | `/db/tva_update.sql`                  | Updated TVA mapping script                              |
-| `/src/risk_prioritization.py`         | Dynamic risk prioritization model                       |
-| `/src/mitigation_recommendations.py`  | Automated risk mitigation recommendations               |
-| `/src/incident_response.py`          | Blue team response module and incident playbooks        |
+| `/src/threat-intelligence-platform/risk_prioritization.py`         | Dynamic risk prioritization model                       |
+| `/src/threat-intelligence-platform/mitigation_recommendations.py`  | Automated risk mitigation recommendations               |
+| `/src/threat-intelligence-platform/incident_response.py`          | Blue team response module and incident playbooks        |
+
+## 📌 All Deliverables Submitted: **24 March 2025**
 
 
 -----------------------------------------------------------------------------------------
 
 
-# 🗓️ Week 4 Real-Time Threat Intelligence Integration (12 – 16 March 2025)
+# 🗓️ Week 4 Real-Time Threat Intelligence Integration (21 March 2025)
 
 **Focus:**  
 Integrating real-time threat intelligence through OSINT APIs, automated updates, alerting systems, and live data visualization.
@@ -139,7 +198,7 @@ In Week 4, the team advanced the platform by implementing real-time threat intel
 ### 🌐 1. OSINT API Integration
 - Integrated APIs from:
   - **Shodan**
-  - **Have I Been Pwned**
+  - **SecurityTrails**
   - **VirusTotal**
 - Backend scripts fetch and store threat data in PostgreSQL.
 - API endpoints implemented in `/api/`.
@@ -166,13 +225,13 @@ In Week 4, the team advanced the platform by implementing real-time threat intel
 ### 🚨 4. High-Risk Alert System
 - Implemented alerting for threats with Risk Score > 20.
 - Alerts sent via email or webhook to system administrators.
-- Alert logic implemented in `/src/alerts.py`.
+- Alert logic implemented in `/src/threat-intelligence-platform/alerts.py`.
 
 ---
 
 ### ✅ 5. API Testing and Validation
 - Conducted unit tests to ensure OSINT API integrations fetch accurate data.
-- Test scripts implemented in `/tests/api_tests.py`.
+- Test scripts implemented in `/api/tests/api_tests.py`.
 
 ---
 
@@ -182,17 +241,17 @@ In Week 4, the team advanced the platform by implementing real-time threat intel
 |----------------------------------------|--------------------------------------------|
 | `/api/shodan_integration.py`          | Shodan API integration script              |
 | `/api/scheduler.py`                   | Auto-update scheduler for threat data      |
-| `/src/components/ThreatDashboard.js`  | Real-time dashboard UI component           |
-| `/src/alerts.py`                      | Alert system for high-risk threats         |
-| `/tests/api_tests.py`                 | Unit tests for API validation              |
+| `/src/threat-dashboard/src/components/ThreatDashboard.js`  | Real-time dashboard UI component           |
+| `/src/threat-intelligence-platform/alerts.py`                      | Alert system for high-risk threats         |
+| `/api/tests/api_tests.py`                 | Unit tests for API validation              |
 
 ---
 
-## 📌 All Deliverables Submitted by: **16 March 2025**
+## 📌 All Deliverables Submitted: **20 March 2025**
 
 -----------------------------------------------------------------------------------------
 
-# 🗓️ Week 3 Asset Identification & Threat-Vulnerability-Asset (TVA) Mapping (5 – 9 March 2025)
+# 🗓️ Week 3 Asset Identification & Threat-Vulnerability-Asset (TVA) Mapping (16 March 2025)
 
 **Focus:**  
 Asset cataloging, TVA (Threat-Vulnerability-Asset) mapping, OSINT data ingestion, and backend/frontend setup for risk assessment visualization.
@@ -245,7 +304,7 @@ In Week 3, the team focused on identifying ShopSmart Solutions’ critical asset
 - Created frontend components to:
   - Display mapped assets and their associated risks.
   - Show real-time updates from OSINT feeds.
-- Component added to `/src/components/TVAMapDashboard.js`.
+- Component added to `/src/threat-dashboard/src/components/Dashboard.js`.
 
 ---
 
@@ -253,20 +312,20 @@ In Week 3, the team focused on identifying ShopSmart Solutions’ critical asset
 
 | File/Directory                           | Description                                      |
 |------------------------------------------|--------------------------------------------------|
-| `/db/assets_table.sql`                  | Structured asset categories and sample entries   |
+| `/db/assets.sql`                  | Structured asset categories and sample entries   |
 | `/db/tva_mapping.sql`                   | TVA mapping schema and example data              |
 | `/api/osint_ingestion.py`               | Script to ingest and normalize OSINT data        |
-| `/src/logic/risk_engine.py`             | Rule-based risk assessment using Deepseek LLM    |
-| `/src/components/TVAMapDashboard.js`    | Frontend dashboard for asset-risk visualization  |
+| `/src/threat-intelligence-platform//risk_analysis.py`             | Rule-based risk assessment using Deepseek LLM    |
+| `/src/threat-dashboard/src/components/Dashboard.js`    | Frontend dashboard for asset-risk visualization  |
 
 ---
 
-## 📌 All Deliverables Submitted by: **9 March 2025**
+## 📌 All Deliverables Submitted: **9 March 2025**
 
 -----------------------------------------------------------------------------------------
 
 
-# 🗓️ Week 2 Setting Up the Web Application & OSINT API Research (26 February – 2 March 2025)
+# 🗓️ Week 2 Setting Up the Web Application & OSINT API Research (5 March 2025)
 
 **Focus:**  
 Setting up the web application framework and conducting OSINT API research.
@@ -317,7 +376,7 @@ In Week 2, the team focused on laying the foundational architecture for the Thre
   - Threat Logs
   - Risk Scores
   - Live Alerts
-- Component committed to `/src/components/ThreatDashboard.js`.
+- Component committed to `/src/threat-dasboard/src/components/Dashboard.js`.
 
 ---
 
@@ -333,5 +392,5 @@ In Week 2, the team focused on laying the foundational architecture for the Thre
 
 ---
 
-## 📌 All Deliverables Submitted by: **2 March 2025**
+## 📌 All Deliverables Submitted: **28 Feb 2025**
 
