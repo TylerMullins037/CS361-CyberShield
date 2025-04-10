@@ -11,104 +11,112 @@ NIST Cybersecurity Framework (CSF) 2.0.
 -----------------------------------------------------------------------------------------
 
 
-🗓️ Week 6 Real-Time Risk Alerts, Incident Response, and Cost-Benefit Analysis for Risk Treatment (26 – 30 March 2025)
-Focus:
+# 🗓️ Week 6 Real-Time Risk Alerts, Incident Response, and Cost-Benefit Analysis for Risk Treatment (26 – 30 March 2025)
+
+## Focus:
 Implementing real-time risk alerts, building incident response workflows, integrating cost-benefit analysis for risk treatment, enhancing the threat intelligence dashboard with risk trends, and optimizing system performance.
 
-🔍 Overview
+---
+
+## 🔍 Overview
 In Week 6, the team focused on implementing a robust alerting system for high-risk threats, automating incident response procedures, and integrating cost-benefit analysis (CBA) for security decision-making. The threat intelligence dashboard was enhanced with real-time risk insights and trends, and API performance was optimized to improve system efficiency.
 
-✅ Tasks Completed
-🚨 1. Real-Time Risk Alerts for Detected Threats
-Developed a real-time notification system to alert stakeholders when threats exceed a Risk Score > 20.
+---
 
-Implemented email and webhook alerts for critical cybersecurity events.
+## ✅ Tasks Completed
 
-Stored alert logs in the database for historical tracking and analysis.
+### 🚨 1. Real-Time Risk Alerts for Detected Threats
+- Developed a real-time notification system to alert stakeholders when threats exceed a Risk Score > 20.
+- Implemented email and webhook alerts for critical cybersecurity events.
+- Stored alert logs in the database for historical tracking and analysis.
 
-🛡️ 2. Incident Response Mechanism
-Built an incident response workflow that automatically suggests countermeasures based on detected threats.
+### 🛡️ 2. Incident Response Mechanism
+- Built an incident response workflow that automatically suggests countermeasures based on detected threats.
+- Linked response plans to NIST's Incident Handling Guide (SP 800-61 Rev. 2).
+- Integrated incident logs into the database for tracking and analysis.
 
-Linked response plans to NIST's Incident Handling Guide (SP 800-61 Rev. 2).
+### 💰 3. Cost-Benefit Analysis (CBA) for Risk Treatment
+- Implemented an automated CBA calculation script to compare the financial impact of security controls.
+- Integrated Annual Loss Expectancy (ALE) before and after mitigation to support informed decision-making.
+- CBA results now provide a clear view of the value of implemented security measures.
 
-Integrated incident logs into the database for tracking and analysis.
+### 📊 4. Enhanced Threat Intelligence Dashboard
+- Added new dashboard components to display real-time risk trends, security insights, and mitigation outcomes.
+- Implemented filtering options to view threats by severity, type, and impact.
+- Visualizations now offer a clearer view of evolving threat landscapes.
 
-💰 3. Cost-Benefit Analysis (CBA) for Risk Treatment
-Implemented an automated CBA calculation script to compare the financial impact of security controls.
+### ⚡ 5. Optimizing API Calls and Threat Data Storage
+- Improved API request efficiency by reducing redundant calls.
+- Integrated caching mechanisms (e.g., Redis) to temporarily store threat intelligence results for faster access.
+- Optimized threat data storage to enhance system performance and scalability.
 
-Integrated Annual Loss Expectancy (ALE) before and after mitigation to support informed decision-making.
+---
 
-CBA results now provide a clear view of the value of implemented security measures.
+## 📂 Files Added/Updated
 
-📊 4. Enhanced Threat Intelligence Dashboard
-Added new dashboard components to display real-time risk trends, security insights, and mitigation outcomes.
+| File/Directory                         | Description                                    |
+|----------------------------------------|------------------------------------------------|
+| `/src/alerts.py`                       | Real-time alert system for high-risk threats   |
+| `/db/alerts.sql`                       | Database schema for alert logs                 |
+| `/src/incident_response.py`            | Incident response mechanism with countermeasures|
+| `/db/incident_logs.sql`                | Incident handling logs schema                  |
+| `/src/cba_analysis.py`                 | CBA automation script for risk treatment       |
+| `/src/components/Dashboard.js`        | Enhanced threat intelligence dashboard UI      |
+| `/src/api_optimizer.py`                | API optimization and caching improvements      |
 
-Implemented filtering options to view threats by severity, type, and impact.
+---
 
-Visualizations now offer a clearer view of evolving threat landscapes.
-
-⚡ 5. Optimizing API Calls and Threat Data Storage
-Improved API request efficiency by reducing redundant calls.
-
-Integrated caching mechanisms (e.g., Redis) to temporarily store threat intelligence results for faster access.
-
-Optimized threat data storage to enhance system performance and scalability.
-
-📂 Files Added/Updated
-File/Directory	Description
-/src/alerts.py	Real-time alert system for high-risk threats
-/db/alerts.sql	Database schema for alert logs
-/src/incident_response.py	Incident response mechanism with countermeasures
-/db/incident_logs.sql	Incident handling logs schema
-/src/cba_analysis.py	CBA automation script for risk treatment
-/src/components/Dashboard.js	Enhanced threat intelligence dashboard UI
-/src/api_optimizer.py	API optimization and caching improvements
-📌 All Deliverables Submitted by: 30 March 2025
+📌 All Deliverables Submitted by: **30 March 2025**
 
 
 -----------------------------------------------------------------------------------------
 
 
-🗓️ Week 5 Risk Analysis, Automated Risk Scoring, and Threat Mitigation Planning (19 – 23 March 2025)
-Focus:
+# 🗓️ Week 5 Risk Analysis, Automated Risk Scoring, and Threat Mitigation Planning (19 – 23 March 2025)
+
+## Focus:
 Enhancing risk scoring using machine learning (LLM), refining TVA mapping, developing dynamic risk prioritization models, and automating risk mitigation recommendations.
 
-🔍 Overview
+---
+
+## 🔍 Overview
 In Week 5, the team advanced the platform by incorporating machine learning models for dynamic risk analysis, refining the threat-vulnerability-asset (TVA) mapping using live OSINT intelligence, and creating a system for automated risk mitigation. Additionally, a dynamic risk prioritization model was developed to assess and highlight critical threats, and blue team capabilities were enhanced by linking mitigation strategies to real-time alerts.
 
-✅ Tasks Completed
-🤖 1. LLM-Based Risk Scoring
-Integrated GPT-4 or Hugging Face models to dynamically analyze threat data and adjust risk scores.
+---
 
-Developed a script for real-time AI-powered risk assessments.
+## ✅ Tasks Completed
 
-🔄 2. Refining TVA Mapping Using OSINT Intelligence
-Updated TVA mappings based on live threat intelligence.
+### 🤖 1. LLM-Based Risk Scoring
+- Integrated GPT-4 or Hugging Face models to dynamically analyze threat data and adjust risk scores.
+- Developed a script for real-time AI-powered risk assessments.
 
-Adjusted likelihood and impact values for threats like phishing, SQL injection, and DDoS based on real-time data.
+### 🔄 2. Refining TVA Mapping Using OSINT Intelligence
+- Updated TVA mappings based on live threat intelligence.
+- Adjusted likelihood and impact values for threats like phishing, SQL injection, and DDoS based on real-time data.
 
-📊 3. Dynamic Risk Prioritization Model
-Developed an algorithm to prioritize threats dynamically based on their risk scores.
+### 📊 3. Dynamic Risk Prioritization Model
+- Developed an algorithm to prioritize threats dynamically based on their risk scores.
+- Implemented a weighted scoring system to highlight high-priority risks for immediate attention.
 
-Implemented a weighted scoring system to highlight high-priority risks for immediate attention.
+### ⚙️ 4. Automated Risk Mitigation Recommendations
+- Created an automated system to generate mitigation strategies for various detected threats.
+- Integrated mitigation strategies into the dashboard for real-time blue team actions.
 
-⚙️ 4. Automated Risk Mitigation Recommendations
-Created an automated system to generate mitigation strategies for various detected threats.
+### 🛡️ 5. Blue Teaming & Incident Response Integration
+- Integrated blue team capabilities by linking risk mitigation recommendations to threat alerts.
+- Developed response playbooks for each detected threat to guide incident management.
 
-Integrated mitigation strategies into the dashboard for real-time blue team actions.
+---
 
-🛡️ 5. Blue Teaming & Incident Response Integration
-Integrated blue team capabilities by linking risk mitigation recommendations to threat alerts.
+## 📂 Files Added/Updated
 
-Developed response playbooks for each detected threat to guide incident management.
-
-📂 Files Added/Updated
-File/Directory	Description
-/src/risk_analysis.py	LLM-based risk scoring script
-/db/tva_update.sql	Updated TVA mapping script
-/src/risk_prioritization.py	Dynamic risk prioritization model
-/src/mitigation_recommendations.py	Automated risk mitigation recommendations
-/src/incident_response.py	Blue team response module and incident playbooks
+| File/Directory                        | Description                                             |
+|---------------------------------------|---------------------------------------------------------|
+| `/src/risk_analysis.py`               | LLM-based risk scoring script                           |
+| `/db/tva_update.sql`                  | Updated TVA mapping script                              |
+| `/src/risk_prioritization.py`         | Dynamic risk prioritization model                       |
+| `/src/mitigation_recommendations.py`  | Automated risk mitigation recommendations               |
+| `/src/incident_response.py`          | Blue team response module and incident playbooks        |
 
 
 -----------------------------------------------------------------------------------------
