@@ -35,10 +35,13 @@ The dashboard serves as a real-time threat intelligence platform that helps you:
 The dashboard is accessible via your web browser at:
 
 ```
-http://[your-server-address]/threat-dashboard
+http://[your-server-address]/dashboard
 ```
+You will be prompted for a login and for testing purposed you can enter:
+admin
+myPassword! 
 
-No additional software installation is required. The dashboard works best with Chrome, Firefox, or Edge browsers (latest versions).
+No additional software installation is required for the website. The dashboard works best with Chrome, Firefox, or Edge browsers (latest versions).
 
 ### User Interface Basics
 The dashboard uses a dark theme designed for visibility in security operations environments. The interface includes:
