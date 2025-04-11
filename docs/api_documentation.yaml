@@ -1,0 +1,206 @@
+openapi: 3.0.0
+info:
+  title: Threat Intelligence API
+  description: This API provides access to threat intelligence data, including assets, threats, mitigation strategies, and reporting capabilities for threat management systems.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000/api
+    description: Development server
+
+paths:
+  /assets:
+    get:
+      summary: Get All Assets
+      description: Retrieves all recorded assets from the system.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                - id: 1
+                  asset_name: "Web Server"
+                  asset_type: "Server"
+                  description: "Primary web application server"
+                - id: 2
+                  asset_name: "Customer Database"
+                  asset_type: "Database"
+                  description: "Stores customer information and transaction data"
+        '500':
+          description: Database Connection Error
+
+  /threats:
+    get:
+      summary: Get All Threats
+      description: Retrieves all recorded threats from the system.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                - name: "SQL Injection"
+                  vulnerability: "Unvalidated user input passed to SQL query"
+                  likelihood: 3
+                  impact: 5
+                  risk_score: 15
+                  date: "2025-03-15"
+                - name: "DDoS Attack"
+                  vulnerability: "Insufficient rate limiting on public endpoints"
+                  likelihood: 4
+                  impact: 4
+                  risk_score: 16
+                  date: "2025-03-10"
+
+  /threat_data:
+    get:
+      summary: Get Threat Data
+      description: Retrieves detailed threat data including IP addresses, ports, and services.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                - ip_address: "192.168.1.100"
+                  ports: "80,443"
+                  services: "HTTP,HTTPS"
+                  Threat: "Web Scanner"
+                - ip_address: "10.0.0.5"
+                  ports: "22"
+                  services: "SSH"
+                  Threat: "Brute Force"
+
+  /high_risk_threats:
+    get:
+      summary: Get High Risk Threats
+      description: Retrieves threats with a risk score greater than 10 and their mitigation strategies.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                - threat: "SQL Injection"
+                  risk_score: 15
+                  strategies: "Implement input validation and parameterized queries"
+                  id: 1
+                - threat: "DDoS Attack"
+                  risk_score: 16
+                  strategies: "Deploy WAF and implement rate limiting"
+                  id: 2
+
+  /risk-trends:
+    get:
+      summary: Get Risk Trends
+      description: Retrieves historical risk data showing alert counts by date.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                - date: "2025-03-01"
+                  count: 5
+                - date: "2025-03-02"
+                  count: 3
+                - date: "2025-03-03"
+                  count: 7
+
+  /mitigation-strategies:
+    get:
+      summary: Get Mitigation Strategies
+      description: Retrieves all threats and their associated mitigation strategies.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                - threat: "SQL Injection"
+                  strategies: "Implement input validation and parameterized queries"
+                - threat: "DDoS Attack"
+                  strategies: "Deploy WAF and implement rate limiting"
+
+  /generate-pdf-report:
+    get:
+      summary: Generate PDF Report
+      description: Generates a comprehensive PDF report containing threat assessments and mitigation strategies.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                success: true
+                file: "reports/threat_report_20250411_123045.pdf"
+
+  /generate-csv-report:
+    get:
+      summary: Generate CSV Report
+      description: Generates a CSV report of all threats and their details.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                success: true
+                file: "reports/threat_report_20250411_123045.csv"
+
+  /reports/{filename}:
+    get:
+      summary: Download Report
+      description: Downloads a previously generated report.
+      parameters:
+        - in: path
+          name: filename
+          required: true
+          schema:
+            type: string
+          description: The name of the report file to download
+      responses:
+        '200':
+          description: OK
+          content:
+            application/pdf: {}
+            text/csv: {}
+
+  /webhook-handler:
+    post:
+      summary: Webhook Handler
+      description: Endpoint for receiving webhook notifications from external systems.
+      requestBody:
+        content:
+          application/json:
+            example:
+              event_type: "new_threat_detected"
+              threat_data:
+                ip_address: "45.33.22.11"
+                threat_type: "Malware"
+                confidence: 0.95
+              timestamp: "2025-04-11T14:30:00Z"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                status: "success"
+
+components:
+  responses:
+    DatabaseError:
+      description: Failed to connect to the database
+      content:
+        application/json:
+          example:
+            error: "Failed to connect to the database"
+
+    InternalError:
+      description: Internal processing error
+      content:
+        application/json:
+          example:
+            error: "Internal processing error: [error details]"
