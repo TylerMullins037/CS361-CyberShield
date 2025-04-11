@@ -1,479 +1,248 @@
 # ShopSmart Solutions Threat Intelligence Dashboard
-
-## User Guide for Blue Team Analysts  
+## User Guide for Blue Team Analysts
 **Version 1.0**  
 **Last Updated: April 11, 2025**
 
----
-
 ## Table of Contents
-
-- [Introduction](#introduction)  
-- [Getting Started](#getting-started)  
-- [Dashboard Overview](#dashboard-overview)  
-- [Monitoring Assets](#monitoring-assets)  
-- [Analyzing Threats](#analyzing-threats)  
-- [Advanced Threat Filtering](#advanced-threat-filtering)  
-- [Understanding Risk Scores](#understanding-risk-scores)  
-- [Reviewing Mitigation Strategies](#reviewing-mitigation-strategies)  
-- [Generating Reports](#generating-reports)  
-- [Best Practices](#best-practices)  
-- [Quick Reference](#quick-reference)  
-
----
+1. [Introduction](#introduction)
+2. [Getting Started](#getting-started)
+3. [Dashboard Overview](#dashboard-overview)
+4. [Monitoring Assets](#monitoring-assets)
+5. [Analyzing Threats](#analyzing-threats)
+6. [Advanced Threat Filtering](#advanced-threat-filtering)
+7. [Understanding Risk Scores](#understanding-risk-scores)
+8. [Reviewing Mitigation Strategies](#reviewing-mitigation-strategies)
+9. [Generating Reports](#generating-reports)
+10. [Best Practices](#best-practices)
+11. [Quick Reference](#quick-reference)
 
 ## Introduction
-
-Welcome to the **ShopSmart Solutions Threat Intelligence Dashboard** – your central command center for monitoring, analyzing, and responding to security threats across your organization's digital infrastructure.
+Welcome to the ShopSmart Solutions Threat Intelligence Dashboard - your central command center for monitoring, analyzing, and responding to security threats across your organization's digital infrastructure.
 
 This user guide is specifically designed for blue team analysts and provides practical instructions on using the dashboard effectively to enhance your organization's security posture.
 
 ### Purpose of the Dashboard
-
 The dashboard serves as a real-time threat intelligence platform that helps you:
-
-- Monitor all digital assets in your environment  
-- Identify and prioritize security threats  
-- Understand risk levels and trends  
-- Implement effective mitigation strategies  
-- Generate comprehensive security reports  
-
----
+- Monitor all digital assets in your environment
+- Identify and prioritize security threats
+- Understand risk levels and trends
+- Implement effective mitigation strategies
+- Generate comprehensive security reports
 
 ## Getting Started
 
 ### Accessing the Dashboard
+The dashboard is accessible via your web browser at:
 
-Access the dashboard via your web browser at:
+```
+http://[your-server-address]/threat-dashboard
+```
 
-http://[your-server-address]/
-
-
-No additional software installation is required. The dashboard works best with **Chrome**, **Firefox**, or **Edge** (latest versions).
+No additional software installation is required. The dashboard works best with Chrome, Firefox, or Edge browsers (latest versions).
 
 ### User Interface Basics
-
 The dashboard uses a dark theme designed for visibility in security operations environments. The interface includes:
-
-- Top navigation bar  
-- Summary cards for key metrics  
-- Filtering controls  
-- Data visualization charts  
-- Detailed data tables  
+- Navigation bar at the top
+- Summary cards for key metrics
+- Filtering controls
+- Data visualization charts
+- Detailed data tables
 
 ### Data Refresh
+The dashboard automatically fetches data when you first load the page. To manually refresh the data:
+- Click the refresh icon in the top-right corner of the navigation bar
+- The "Last updated" timestamp will update to reflect the current time
 
-- The dashboard fetches data automatically upon loading.  
-- To manually refresh: click the refresh icon in the top-right corner of the nav bar.  
-- The **"Last updated"** timestamp will update accordingly.  
-- Some elements like risk scores refresh every 5 seconds automatically.  
-
----
+Some elements, such as risk scores, automatically refresh every 5 seconds.
 
 ## Dashboard Overview
-
-The dashboard is organized into key sections:
+The dashboard is organized into several key sections:
 
 ### 1. Summary Cards
-
-At the top of the dashboard:
-
-- **Monitored Assets**: Total number of tracked assets  
-- **Active Threats**: Current number of identified threats  
-- **High Risk Threats**: Number of threats with "High" risk classification  
-- **Mitigation Strategies**: Number of available recommendations  
+Located at the top of the dashboard, these cards provide at-a-glance metrics:
+- **Monitored Assets**: Total number of assets being tracked
+- **Active Threats**: Current number of identified threats
+- **High Risk Threats**: Number of threats with "High" risk classification
+- **Mitigation Strategies**: Number of available mitigation recommendations
 
 ### 2. Report Generation Controls
-
 Buttons for generating:
-
-- **CSV reports** (for analysis)  
-- **PDF reports** (for presentation)  
+- CSV reports (for data analysis)
+- PDF reports (for management presentations)
 
 ### 3. Enhanced Filtering Controls
-
-Advanced filters for threats based on:
-
-- Severity  
-- Impact  
-- Threat type  
-- Risk score  
+Advanced filters for targeting specific threats based on:
+- Severity
+- Impact
+- Threat type
+- Risk score
 
 ### 4. Data Sections
-
-- **Asset Inventory**  
-- **Threat Intelligence Overview**  
-- **Risk Trend Analysis**  
-- **Threat Distribution**  
-- **Threat Data** (network-focused)  
-- **Mitigation Strategies**  
-- **Real-Time Risk Assessment**  
-
----
+- Asset Inventory
+- Threat Intelligence Overview
+- Risk Trend Analysis
+- Threat Distribution
+- Threat Data (network-focused)
+- Mitigation Strategies
+- Real-Time Risk Assessment
 
 ## Monitoring Assets
 
 ### Asset Inventory Section
+The Asset Inventory section displays all digital assets under monitoring:
 
-Displays all digital assets under monitoring:
-
-- **Name**: Asset identifier  
-- **Type**: Server, DB, network device, etc.  
-- **Description**: Detailed info  
+Key features include:
+- **Name**: Asset identifier
+- **Type**: Classification (server, database, network device, etc.)
+- **Description**: Detailed information about the asset
 
 ### Filtering Assets
-
-- Use **"Filter by Type"** dropdown (top-right of Asset Inventory section)  
-- Select asset type → table updates  
-- To reset → choose **"All Types"**
+To focus on specific asset types:
+1. Locate the "Filter by Type" dropdown in the top-right of the Asset Inventory section
+2. Select the desired asset type from the dropdown menu
+3. The table will automatically update to show only assets of the selected type
+4. To return to viewing all assets, select "All Types" from the dropdown
 
 ### Asset Details
-
-Hover over the description field to expand full asset descriptions.
-
----
+For more information about an asset, hover over the description field. The truncated description will expand to show the full text.
 
 ## Analyzing Threats
 
 ### Threat Intelligence Overview
+The Threat Intelligence section displays detailed information about identified threats:
 
-Displays detailed threat data:
-
-- **Threat**: Name or description  
-- **Vulnerability**: Exploited weakness  
-- **Likelihood**: Probability score (1-5)  
-- **Impact**: Damage score (1-5)  
-- **Risk**: Combined score + classification  
+Key information includes:
+- **Threat**: Name or description of the threat
+- **Vulnerability**: The specific vulnerability being exploited
+- **Likelihood**: Probability score (1-5) of the threat occurring
+- **Impact**: Potential damage score (1-5) if the threat is realized
+- **Risk**: Combined score and classification (Low/Medium/High)
 
 ### Threat Data Section
-
-Network-specific threat info:
-
-- **IP Address**: Source/target  
-- **Ports**: Open ports detected  
-- **Services**: Vulnerable services  
+This section provides network-focused information:
+- **IP Address**: Source or target IP addresses associated with threats
+- **Ports**: Open ports identified during scanning
+- **Services**: Running services that may be vulnerable
 
 ### Visual Analysis Tools
-
-- **Risk Trend Analysis**: Historical chart  
-- **Threat Distribution**: Risk level pie chart  
-- **Real-Time Risk Assessment**: Bar chart  
-
----
+The dashboard includes several visualization tools:
+1. **Risk Trend Analysis**: Chart showing historical risk trends over time
+2. **Threat Distribution**: Pie chart showing proportion of threats by risk level
+3. **Real-Time Risk Assessment**: Bar chart showing risk scores for all threats
 
 ## Advanced Threat Filtering
 
 ### Enhanced Filtering Controls
+The dashboard provides comprehensive filtering capabilities:
 
-Filters include:
-
-- **Severity**: High/Medium/Low  
-- **Impact**: Level 1–5  
-- **Threat Type**: Category-based  
-- **Risk Score**: Set minimum threshold  
+Available filters include:
+1. **Severity Filter**: Target threats by risk classification (High/Medium/Low)
+2. **Impact Filter**: Focus on threats with specific impact levels (1-5)
+3. **Threat Type Filter**: Filter threats by category
+4. **Risk Score Filter**: Set minimum risk score threshold
 
 ### Using Filters
-
-- Select values via dropdown/input fields  
-- Tables and charts auto-update  
-- Active filters show as **chips** below controls  
-- Remove filters by clicking the **‘X’** on each chip  
+To apply filters:
+1. Select values in any of the filter dropdown menus or input fields
+2. The threat tables and charts will automatically update
+3. Active filters are displayed as chips below the filter controls
+4. Remove individual filters by clicking the 'X' on each filter chip
 
 ### Filter Results Summary
-
-- Displays number of shown vs. total threats  
-- Active filters visible for quick review  
-
----
+The dashboard shows a summary of your filter results:
+- Number of threats displayed vs. total threats
+- Active filter chips for quick reference
 
 ## Understanding Risk Scores
 
 ### Risk Calculation
+Risk scores are calculated using the formula:
 
-```plaintext
-Risk Score = Likelihood × 
+**Risk Score = Likelihood × Impact**
 
-# ShopSmart Solutions Threat Intelligence Dashboard
-
-## User Guide for Blue Team Analysts  
-**Version 1.0**  
-**Last Updated: April 11, 2025**
-
----
-
-## Table of Contents
-
-- [Introduction](#introduction)  
-- [Getting Started](#getting-started)  
-- [Dashboard Overview](#dashboard-overview)  
-- [Monitoring Assets](#monitoring-assets)  
-- [Analyzing Threats](#analyzing-threats)  
-- [Advanced Threat Filtering](#advanced-threat-filtering)  
-- [Understanding Risk Scores](#understanding-risk-scores)  
-- [Reviewing Mitigation Strategies](#reviewing-mitigation-strategies)  
-- [Generating Reports](#generating-reports)  
-- [Best Practices](#best-practices)  
-- [Quick Reference](#quick-reference)  
-
----
-
-## Introduction
-
-Welcome to the **ShopSmart Solutions Threat Intelligence Dashboard** — your central command center for monitoring, analyzing, and responding to security threats across your organization's digital infrastructure.
-
-This user guide is specifically designed for **blue team analysts** and provides practical instructions on using the dashboard effectively to enhance your organization's security posture.
-
-### Purpose of the Dashboard
-
-The dashboard serves as a real-time threat intelligence platform that helps you:
-
-- Monitor all digital assets in your environment  
-- Identify and prioritize security threats  
-- Understand risk levels and trends  
-- Implement effective mitigation strategies  
-- Generate comprehensive security reports  
-
----
-
-## Getting Started
-
-### Accessing the Dashboard
-
-Access the dashboard via your web browser:  
-`http://[your-server-address]/`
-
-> **Supported browsers:** Chrome, Firefox, Edge (latest versions)  
-> **Note:** No software installation required.
-
-### User Interface Basics
-
-- **Dark theme:** Optimized for SOC environments  
-- **Navigation bar:** Top of screen  
-- **Summary cards:** Display key metrics  
-- **Filters & charts:** Interactive and real-time  
-- **Tables:** Detailed data views  
-
-### Data Refresh
-
-- Auto-refresh on load  
-- Manual refresh: Click the 🔄 icon (top-right)  
-- Risk scores auto-refresh every 5 seconds  
-
----
-
-## Dashboard Overview
-
-### Key Sections
-
-1. **Summary Cards**  
-   - Monitored Assets  
-   - Active Threats  
-   - High Risk Threats  
-   - Mitigation Strategies  
-
-2. **Report Generation Controls**  
-   - CSV for analysis  
-   - PDF for presentation  
-
-3. **Enhanced Filtering Controls**  
-   - Filter by Severity, Impact, Type, Risk Score  
-
-4. **Data Sections**  
-   - Asset Inventory  
-   - Threat Intelligence  
-   - Risk Trends  
-   - Threat Distribution  
-   - Threat Data  
-   - Mitigation Strategies  
-   - Real-Time Risk Assessment  
-
----
-
-## Monitoring Assets
-
-### Asset Inventory Section
-
-Displays all monitored digital assets:
-
-- **Name**  
-- **Type** (server, database, etc.)  
-- **Description**  
-
-### Filtering Assets
-
-- Use “Filter by Type” dropdown  
-- Select a type or choose “All Types” to reset  
-
-### Asset Details
-
-- Hover over the **Description** to view full text  
-
----
-
-## Analyzing Threats
-
-### Threat Intelligence Overview
-
-Displays identified threat details:
-
-- **Threat**  
-- **Vulnerability**  
-- **Likelihood** (1–5)  
-- **Impact** (1–5)  
-- **Risk** (score & classification)  
-
-### Threat Data Section
-
-Focuses on network threat elements:
-
-- **IP Address**  
-- **Ports**  
-- **Services**  
-
-### Visual Analysis Tools
-
-- **Risk Trend Analysis**  
-- **Threat Distribution**  
-- **Real-Time Risk Assessment**  
-
----
-
-## Advanced Threat Filtering
-
-### Enhanced Filtering Controls
-
-Filter threats by:
-
-- **Severity** (Low, Medium, High)  
-- **Impact** (1–5)  
-- **Threat Type**  
-- **Risk Score** (threshold)  
-
-### Using Filters
-
-- Apply filters via dropdown/input  
-- View results instantly  
-- Active filters appear as **chips**  
-- Remove chips with ❌ icon  
-
-### Filter Results Summary
-
-- Shows filtered count vs total  
-- Active filters displayed for reference  
-
----
-
-## Understanding Risk Scores
-
-### Risk Calculation
-
-- **Formula:** `Risk Score = Likelihood × Impact`  
-- **Likelihood:** 1–5  
-- **Impact:** 1–5  
-- **Score Range:** 1–25  
+Where:
+- Likelihood is rated on a scale of 1-5
+- Impact is rated on a scale of 1-5
+- Risk Score ranges from 1-25
 
 ### Risk Classification
-
-- **Low Risk (Green):** 1–9  
-- **Medium Risk (Orange):** 10–19  
-- **High Risk (Red):** 20–25  
+Risk scores are classified into three categories:
+- **Low Risk** (Green): Scores 1-9
+- **Medium Risk** (Orange): Scores 10-19
+- **High Risk** (Red): Scores 20-25
 
 ### Risk Visualization
+The dashboard uses consistent color coding throughout:
+- Red for High Risk
+- Orange for Medium Risk
+- Green for Low Risk
 
-Color-coded consistently:
-
-- **Red → High**  
-- **Orange → Medium**  
-- **Green → Low**
-
-Appears in:
-
-- Threat Intelligence table (left border)  
-- Risk bar chart  
-- Pie chart  
-
----
+This color coding appears in:
+- The Threat Intelligence table (left border)
+- Risk Assessment bar chart
+- Threat Distribution pie chart
 
 ## Reviewing Mitigation Strategies
 
 ### Mitigation Strategies Section
+This section provides recommended actions for addressing identified threats:
 
-Shows recommendations for threat resolution:
-
-- **Threat Name**  
-- **Strategies:** Recommended actions  
+For each threat, you'll see:
+- **Threat Name**: The specific threat being addressed
+- **Strategies**: Recommended actions to mitigate the threat
 
 ### Implementing Mitigations
-
-- **Prioritize by risk score**  
-- **Review all suggested strategies**  
-- **Follow internal change management**  
-- **Document your actions**  
-- **Monitor for score changes post-mitigation**  
-
----
+To implement mitigation strategies:
+1. Prioritize based on risk scores (address high-risk threats first)
+2. Review all recommended strategies for each threat
+3. Follow your organization's change management procedures
+4. Document actions taken
+5. Monitor risk scores after implementation to verify effectiveness
 
 ## Generating Reports
 
 ### Available Report Types
-
-- **CSV Report:** Raw data  
-- **PDF Report:** Formatted visuals  
+The dashboard offers two reporting options:
+1. **CSV Report**: Raw data export for detailed analysis
+2. **PDF Report**: Formatted report with visualizations for presentations
 
 ### Generating a CSV Report
-
-1. Click **Export CSV Report**  
-2. Download starts automatically  
-3. Open in Excel or similar tool  
+To generate and download a CSV report:
+1. Click the "Export CSV Report" button in the top action bar
+2. The system will generate the report
+3. The file will automatically download to your device
+4. Open the file with Excel or another spreadsheet application for analysis
 
 ### Generating a PDF Report
-
-1. Click **Generate PDF Report**  
-2. Download starts automatically  
-3. View with any PDF reader  
+To generate and download a PDF report:
+1. Click the "Generate PDF Report" button in the top action bar
+2. The system will create a formatted report
+3. The file will automatically download to your device
+4. Open the file with any PDF reader
 
 ### Report Contents
-
-- Asset inventory  
-- Threat intel data  
-- Risk scores  
-- Mitigation suggestions  
-
----
+Reports include:
+- Asset inventory
+- Threat intelligence data
+- Risk assessment information
+- Mitigation recommendations
 
 ## Best Practices
 
 ### Daily Operations
-
-- **Check daily:** Review the dashboard at each shift start  
-- **Risk Prioritization:** Address high-risk first  
-- **Trend Monitoring:** Watch Risk Trend chart  
-- **Action Logging:** Record all mitigations  
-- **Weekly Reports:** Share with leadership  
+Follow these best practices for effective security monitoring:
+1. **Regular Review**: Check the dashboard at the beginning of each shift
+2. **Prioritize by Risk**: Focus first on high-risk threats (red)
+3. **Track Trends**: Monitor the Risk Trend Analysis chart for patterns
+4. **Document Actions**: Record all mitigation efforts and outcomes
+5. **Generate Reports**: Create weekly reports for management review
 
 ### Incident Response Workflow
-
-- **Assess:** Review new threats  
-- **Contextualize:** Identify affected assets  
-- **Investigate:** Use network data  
-- **Plan:** Review strategies  
-- **Act:** Mitigate threats  
-- **Document:** Note actions taken  
-- **Verify:** Ensure threat reduction  
-
----
-
-## Quick Reference
-
-| Task | Action |
-|------|--------|
-| Refresh Data | Click refresh icon (top-right) |
-| Filter by Type | Use dropdown in Asset Inventory section |
-| View Full Description | Hover over truncated text |
-| Export CSV Report | Click Export CSV Report in action bar |
-| Export PDF Report | Click Generate PDF Report in action bar |
-| Remove Filter | Click ‘X’ on filter chip |
-| Identify High Risk Threats | Look for Red highlights in charts and tables |
-
----
-
+When a new high-risk threat appears:
+1. **Assess**: Review all details in the Threat Intelligence section
+2. **Contextualize**: Check the Asset Inventory to understand affected systems
+3. **Investigate**: Use the Threat Data section to gather network information
+4. **Plan**: Review recommended Mitigation Strategies
+5. **Act**: Implement appropriate mitigations
+6. **Document**: Record all actions taken
+7. **Verify**: Confirm risk reduction after mitigation
