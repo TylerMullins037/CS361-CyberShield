@@ -2,26 +2,35 @@ import psycopg2
 import shodan
 import requests
 from time import sleep
-import logging
+import threat_log
 import Shodan
-
+import blue_team_defense
+import logging
 IP_ADDRESS  = "8.8.8.8"
 api_keys = Shodan.API_KEY
 
-SECURITY_TRAILS_API_KEY = "**********"
-VIRUS_TOTAL_API_KEY = "************"
+SECURITY_TRAILS_API_KEY = "VkDrUE5R_Yo_vY8GelgPzEHUSga-CNRM"
+VIRUS_TOTAL_API_KEY = "51abcad742518c310918dd5bbd831e67e15d11bba3827285c3a3c50400c7f8d4"
 
 
 DB_HOST = "db-postgresql-nyc3-21525-do-user-20065838-0.k.db.ondigitalocean.com"
 DB_NAME = "defaultdb"
 DB_USER = "doadmin"
 DB_PORT="25060"
-DB_PASS = "************8"
+DB_PASS = "*******"
 #configuring logging module to display message above Error, warning, Critical
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-
+#Dictionary of Ips flagged as potentially dangerous
+threat_intel_ips = {
+    "192.168.1.10": {"source": "VirusTotal", "score": 90}, #flagged by virus total
+    "8.8.8.8" : {"source": "Shodan", "ports": [23, 445]}, #comming from shodan showing it has dangerous ports
+    "203.0.113.50" : {"source": "SecurityTrails", "flagged":True} # flagged by securityTrails to show it is malicious
+}
+#IP addresss to never be blocked if even they are detected by the threat intelligence tools
+WHITE_LISTED_IPS = ["127.0.0.1", "198.168.0.1", "8.8.8.8"]
 #Testing for Database connection
+VT_THRESHOLD=75
 try:
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER,password=DB_PASS,
                              host=DB_HOST, port=DB_PORT,sslmode="require")
@@ -91,7 +100,17 @@ def store_threat_intelligence(threat_name, vulnerability, likelihood, impact, ri
 def fetch_osint_updates(ip):
     print("Begin of the main function...")
     domain = "google.com"
-
+    for ip, data in threat_intel_ips.items():
+        reason = None
+        if data["source"] == "VirusTotal" and data.get("score",0) >= VT_THRESHOLD:
+            return "VirusTotal Scre {data['score']}".format(data=data)
+        #check for threat from Shodan
+        elif data["source"] == "Shodan" and  any(p in [23, 445] for p in data.get("ports", [])):
+            reason =  "Shodan flagged risk ports: {data['ports']}".format(data=data)
+        elif data["source"] == "SecurityTrails"  and data.get("flagged"):
+            reason = "SecurityTrails flagged ip as suspicious"
+        if reason:
+            blue_team_defense.block(ip, reason)
 
     # Fetch and process Shodan data
     shodan_data = fetch_shodan_data(ip)
@@ -131,3 +150,6 @@ def fetch_osint_updates(ip):
             )
 
     logging.info("OSINT Threat data fetch complete")
+
+
+
