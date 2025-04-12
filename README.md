@@ -1,4 +1,4 @@
-Project Overview: ShopSmart Threat Intelligence Platform
+# Project Overview: ShopSmart Threat Intelligence Platform
 This project created an advanced threat intelligence and risk management system for ShopSmart e-commerce. The platform features real-time OSINT integration (Shodan, SecurityTrails, VirusTotal), AI-powered risk scoring, automated threat hunting, and proactive defense capabilities.
 Key components include an asset-threat-vulnerability mapping system, automated alerting for high-risk threats, LLM-enhanced analysis, and a comprehensive dashboard displaying risk trends and mitigation recommendations. The system also provides incident response workflows, cost-benefit analysis for security decisions, and extensive documentation.
 By combining AI automation with blue team defense features, the platform enables ShopSmart to effectively monitor, assess, and mitigate cybersecurity risks in real-time.
