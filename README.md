@@ -11,6 +11,64 @@ NIST Cybersecurity Framework (CSF) 2.0.
 -----------------------------------------------------------------------------------------
 
 
+# 🗓️ Week 8 Advanced Blue Teaming, AI-Powered Threat Hunting, and Documentation (13 April 2025)
+
+**Focus:**  
+Developing proactive blue teaming defense features, integrating AI-powered threat hunting techniques, automating threat mitigation, and producing complete system and API documentation.
+
+---
+
+## 🔍 Overview  
+In Week 8, the team advanced the system's defense capabilities by building automated blue teaming features, integrating AI-driven threat hunting mechanisms, and enhancing threat mitigation with automated remediation. Comprehensive user guides and system integration documentation were also developed to support future analysts and developers.
+
+---
+
+## ✅ Tasks Completed
+
+### 🔐 1. Implementing Advanced Blue Teaming Features  
+- Developed real-time defensive scripts that respond to detected threats.  
+- Automatically applied firewall rules to block malicious IPs.  
+- *Example:* Auto-blocking IPs based on OSINT threat data.
+
+### 🧠 2. AI-Powered Threat Hunting  
+- Integrated large language models (LLMs) for behavior-based threat analysis.  
+- Created AI scripts to predict potential attack vectors.  
+- Used GPT-4 for analyzing threat patterns in real-time.
+
+### 🛡️ 3. Enhancing the System with Automated Remediation  
+- Implemented automated countermeasures for detected threats.  
+- Developed logic for sandboxing, WAF enforcement, and phishing counteractions.  
+- *Example:* Isolate or rate-limit systems under DDoS attack.
+
+### 📘 4. Comprehensive System Documentation & User Guide  
+- Authored a system manual covering installation, dashboard usage, and mitigation logic.  
+- Wrote a user guide tailored for blue team analysts with step-by-step walkthroughs.
+
+### 🔗 5. API Documentation for System Integration  
+- Created an OpenAPI (Swagger) schema to define threat intelligence endpoints.  
+- Provided example requests/responses for external system integration.
+
+---
+
+## 📂 Files Added/Updated
+
+| File/Directory | Description |
+|----------------|-------------|
+| `/src/blue_team_defense.py` | Script for real-time automated defense features |
+| `/src/ai_threat_hunting.py` | AI-powered threat detection and prediction |
+| `/src/threat_mitigation.py` | Automated remediation and response system |
+| `/docs/system_manual.md` | Complete system manual and setup instructions |
+| `/docs/user_guide.md` | User guide for blue team analysts |
+| `/docs/api_documentation.yaml` | OpenAPI documentation for integration |
+
+---
+
+## 📌 All Deliverables Submitted: 11 April 2025
+
+
+-----------------------------------------------------------------------------------------
+
+
 # 🗓️ Week 7 Fine-Tuning Risk Scoring, Threat Report Generation, and Security Audits (10 April 2025)
 
 ## Focus:
