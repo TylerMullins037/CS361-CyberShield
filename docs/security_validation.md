@@ -1,130 +1,147 @@
 # Nmap Scan Summary
 
----
-
-## **Port 3000 – Node.js Express Framework (HTTP)**  
-**Risk Level:**  Medium  
+## Port 5000 – Werkzeug HTTP Server (Python)  
+**Risk Level:** Medium
 
 **Overview:**  
-Port 3000 is typically used for local development environments, especially for Node.js applications. Exposing such environments to the internet poses risks, as they are often not configured with production-grade security.
+Werkzeug is a lightweight server typically bundled with Flask for development use only. It is not designed for scalability or secure web hosting, making it risky to expose on public networks.
 
-**Recommended Mitigation:**  
-- Ensure applications are production-ready with:
-  - HTTPS enabled  
-  - Rate limiting  
-  - Proper input validation  
-- Use a reverse proxy (e.g., **Nginx**, **Apache**) to manage and secure external traffic.
+**Recommended Mitigation:**
+- Avoid using Werkzeug in production environments.
+- Switch to a battle-tested WSGI server such as uWSGI or Gunicorn.
+- Configure firewalls to restrict external access to development ports.
 
 ---
 
-## **Port 5000 – Werkzeug HTTP Server (Python)**  
-**Risk Level:**  Medium  
+## Port 3000 – Node.js Express Framework (HTTP)  
+**Risk Level:** Medium
 
 **Overview:**  
-Werkzeug is a development server commonly used with Python frameworks like Flask. Its default settings lack essential production-grade security features such as encryption and concurrency handling.
+This port is commonly utilized by developers working with Node.js and Express to host local web applications. When such ports are left open to external access, they often expose development settings not intended for production, which may lack essential security features.
 
-**Recommended Mitigation:**  
-- Do **not** use Werkzeug in production.  
-- Deploy with a secure WSGI server (e.g., **Gunicorn**, **uWSGI**) behind a reverse proxy.  
-- Restrict access to this port via firewall rules.
-
----
-
-#  Burp Suite Scan Results
+**Recommended Mitigation:**
+- Ensure the deployment follows production best practices.
+- Enable HTTPS to secure data in transit.
+- Apply rate-limiting to prevent abuse or brute force attacks.
+- Sanitize all incoming data to avoid injection threats.
+- Route external traffic through a hardened reverse proxy like Nginx or Apache.
 
 ---
 
-### 1. **Reflected Cross-Site Scripting (XSS)**  
-**Severity:** High  
+# Burp Suite Scan Results
 
-- **Vulnerability:** Unsanitized input in `q` parameter is reflected in the response.  
-- **Example Request:** `GET /search?q=<script>alert(1)</script>`  
-- **Risk:** Session hijacking, redirecting users, or running arbitrary scripts.
+## 1. Reflected Cross-Site Scripting (XSS)  
+**Severity:** High
 
----
+**Description:**  
+The application echoes user input from the `q` query parameter directly into the webpage without filtering potentially harmful content.
 
-### 2. **Directory Listing Enabled**  
-**Severity:**  Medium  
+**Example Request:**  
+`GET /search?q=<script>alert(1)</script>`
 
-- **Location:** `http://127.0.0.1:3000/static/`  
-- **Risk:** Reveals potentially sensitive files such as `.env` or config files.
-
----
-
-### 3. **Missing Secure Cookie Attribute**  
-**Severity:**  Medium  
-
-- **Issue:** Cookies are set without the `Secure` flag.  
-- **Example:** `Set-Cookie: sessionid=abc123; HttpOnly`  
-- **Risk:** Interception over unencrypted channels.
+**Impact:**  
+Could allow attackers to execute scripts in a user’s browser, leading to stolen credentials, session hijacking, or redirection to malicious sites.
 
 ---
 
-### 4. **Server Version Disclosure**  
-**Severity:** Low  
+## 2. Directory Listing Enabled  
+**Severity:** Medium
 
-- **Header:** `Server: Werkzeug/3.1.3 Python/3.13.1`  
-- **Risk:** Disclosed software versions can help attackers craft targeted exploits.
+**Location:**  
+`http://127.0.0.1:3000/static/`
+
+**Impact:**  
+The server shows the contents of a folder, which could include configuration files or other sensitive resources meant to stay hidden.
 
 ---
 
-### 5. **Missing CSRF Protection**  
-**Severity:**  Medium  
+## 3. Missing Secure Cookie Attribute  
+**Severity:** Medium
 
-- **Endpoints Affected:** `/login`, `/register`  
-- **Risk:** Allows malicious websites to perform unauthorized actions on behalf of users.
+**Issue:**  
+Cookies issued by the server are missing the `Secure` flag, which ensures they are only sent over encrypted connections.
+
+**Example:**  
+`Set-Cookie: sessionid=abc123; HttpOnly`
+
+**Impact:**  
+If accessed over HTTP, cookies could be intercepted via man-in-the-middle (MitM) attacks.
+
+---
+
+## 4. Server Version Disclosure  
+**Severity:** Low
+
+**Header Info:**  
+`Server: Werkzeug/3.1.3 Python/3.13.1`
+
+**Impact:**  
+Attackers can use version-specific vulnerabilities when software details are exposed in HTTP response headers.
+
+---
+
+## 5. Missing CSRF Protection  
+**Severity:** Medium
+
+**Endpoints Affected:**  
+`/login`, `/register`
+
+**Impact:**  
+An attacker could forge requests that trick authenticated users into unknowingly performing actions, such as submitting forms without their consent.
 
 ---
 
 # OWASP ZAP Scan Results
 
----
+## High Risk
 
-##  **High Risk**
-
-### 1. **Cross-Site Scripting (Reflected)**  
-- **URL:** `http://127.0.0.1:3000/search?q=<script>alert(1)</script>`  
-- **Description:** Input is not sanitized, allowing script injection.  
-- **Solution:** Validate and sanitize all inputs; encode all output.
-
----
-
-##  **Medium Risk**
-
-### 2. **Insecure Cookies**  
-- **URL:** `http://127.0.0.1:3000/`  
-- **Description:** Cookies are sent without the `Secure` flag.  
-- **Solution:** Add `Secure; HttpOnly; SameSite=Strict` attributes to all cookies.
+### 1. Cross-Site Scripting (Reflected)  
+**URL:** `http://127.0.0.1:3000/search?q=<script>alert(1)</script>`  
+**Description:**  
+The server returns user input in the response without escaping HTML, allowing script injection.  
+**Solution:** Validate and sanitize all input. Use proper encoding when displaying user-supplied data.
 
 ---
 
-### 3. **Missing CSRF Token**  
-- **URL:** `http://127.0.0.1:3000/login`  
-- **Description:** Forms lack CSRF protection.  
-- **Solution:** Use anti-CSRF tokens for all state-changing forms.
+## Medium Risk
+
+### 2. Insecure Cookies  
+**URL:** `http://127.0.0.1:3000/`  
+**Description:**  
+Session cookies are transmitted over HTTP, lacking security attributes.  
+**Solution:** Add `Secure`, `HttpOnly`, and `SameSite=Strict` attributes to all session cookies.
 
 ---
 
-## **Low Risk**
-
-### 4. **Server Version Disclosure via HTTP Header**  
-- **URL:** `http://127.0.0.1:3000/`  
-- **Description:** Reveals server version: `Werkzeug/3.1.3 Python/3.13.1`  
-- **Solution:** Suppress or replace the `Server` header.
-
----
-
-### 5. **Directory Browsing**  
-- **URL:** `http://127.0.0.1:3000/static/`  
-- **Description:** Unrestricted access to directory contents.  
-- **Solution:** Disable directory listing in your server configuration.
+### 3. Missing CSRF Token  
+**URL:** `http://127.0.0.1:3000/login`  
+**Description:**  
+Login forms are missing CSRF tokens, leaving them susceptible to forged form submissions.  
+**Solution:** Implement CSRF tokens and validate them for each state-changing request.
 
 ---
 
-##  **Informational**
+## Low Risk
 
-### 6. **X-Frame-Options Header Not Set**  
-- **Risk:** May allow clickjacking attacks.  
-- **Solution:** Set the header:  
-  - `X-Frame-Options: DENY` **or**  
-  - `X-Frame-Options: SAMEORIGIN`
+### 4. Server Version Disclosure via HTTP Header  
+**URL:** `http://127.0.0.1:3000/`  
+**Description:**  
+Reveals the web server and language version in response headers.  
+**Solution:** Mask or remove version details in server responses.
+
+---
+
+### 5. Directory Browsing  
+**URL:** `http://127.0.0.1:3000/static/`  
+**Description:**  
+Lists all files in a directory, potentially exposing sensitive files.  
+**Solution:** Turn off directory listing in the server settings or web config.
+
+---
+
+## Informational
+
+### 6. X-Frame-Options Header Not Set  
+**Risk:**  
+Omission of this header means the site may be loaded in a frame or iframe, which opens the door to clickjacking attacks.  
+**Solution:** Set `X-Frame-Options` to `DENY` or `SAMEORIGIN` to control framing behavior.
