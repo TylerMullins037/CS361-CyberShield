@@ -1,9 +1,9 @@
-# 🔍 Nmap Scan Summary
+# Nmap Scan Summary
 
 ---
 
 ## **Port 3000 – Node.js Express Framework (HTTP)**  
-**Risk Level:** ⚠️ Medium  
+**Risk Level:**  Medium  
 
 **Overview:**  
 Port 3000 is typically used for local development environments, especially for Node.js applications. Exposing such environments to the internet poses risks, as they are often not configured with production-grade security.
@@ -18,7 +18,7 @@ Port 3000 is typically used for local development environments, especially for N
 ---
 
 ## **Port 5000 – Werkzeug HTTP Server (Python)**  
-**Risk Level:** ⚠️ Medium  
+**Risk Level:**  Medium  
 
 **Overview:**  
 Werkzeug is a development server commonly used with Python frameworks like Flask. Its default settings lack essential production-grade security features such as encryption and concurrency handling.
@@ -30,12 +30,12 @@ Werkzeug is a development server commonly used with Python frameworks like Flask
 
 ---
 
-# 🛡️ Burp Suite Scan Results
+#  Burp Suite Scan Results
 
 ---
 
 ### 1. **Reflected Cross-Site Scripting (XSS)**  
-**Severity:** 🔴 High  
+**Severity:** High  
 
 - **Vulnerability:** Unsanitized input in `q` parameter is reflected in the response.  
 - **Example Request:** `GET /search?q=<script>alert(1)</script>`  
@@ -44,7 +44,7 @@ Werkzeug is a development server commonly used with Python frameworks like Flask
 ---
 
 ### 2. **Directory Listing Enabled**  
-**Severity:** ⚠️ Medium  
+**Severity:**  Medium  
 
 - **Location:** `http://127.0.0.1:3000/static/`  
 - **Risk:** Reveals potentially sensitive files such as `.env` or config files.
@@ -52,7 +52,7 @@ Werkzeug is a development server commonly used with Python frameworks like Flask
 ---
 
 ### 3. **Missing Secure Cookie Attribute**  
-**Severity:** ⚠️ Medium  
+**Severity:**  Medium  
 
 - **Issue:** Cookies are set without the `Secure` flag.  
 - **Example:** `Set-Cookie: sessionid=abc123; HttpOnly`  
@@ -61,7 +61,7 @@ Werkzeug is a development server commonly used with Python frameworks like Flask
 ---
 
 ### 4. **Server Version Disclosure**  
-**Severity:** 🟡 Low  
+**Severity:** Low  
 
 - **Header:** `Server: Werkzeug/3.1.3 Python/3.13.1`  
 - **Risk:** Disclosed software versions can help attackers craft targeted exploits.
@@ -69,18 +69,18 @@ Werkzeug is a development server commonly used with Python frameworks like Flask
 ---
 
 ### 5. **Missing CSRF Protection**  
-**Severity:** ⚠️ Medium  
+**Severity:**  Medium  
 
 - **Endpoints Affected:** `/login`, `/register`  
 - **Risk:** Allows malicious websites to perform unauthorized actions on behalf of users.
 
 ---
 
-# 🧪 OWASP ZAP Scan Results
+# OWASP ZAP Scan Results
 
 ---
 
-## 🔴 **High Risk**
+##  **High Risk**
 
 ### 1. **Cross-Site Scripting (Reflected)**  
 - **URL:** `http://127.0.0.1:3000/search?q=<script>alert(1)</script>`  
@@ -89,7 +89,7 @@ Werkzeug is a development server commonly used with Python frameworks like Flask
 
 ---
 
-## ⚠️ **Medium Risk**
+##  **Medium Risk**
 
 ### 2. **Insecure Cookies**  
 - **URL:** `http://127.0.0.1:3000/`  
@@ -105,7 +105,7 @@ Werkzeug is a development server commonly used with Python frameworks like Flask
 
 ---
 
-## 🟡 **Low Risk**
+## **Low Risk**
 
 ### 4. **Server Version Disclosure via HTTP Header**  
 - **URL:** `http://127.0.0.1:3000/`  
@@ -121,7 +121,7 @@ Werkzeug is a development server commonly used with Python frameworks like Flask
 
 ---
 
-## ℹ️ **Informational**
+##  **Informational**
 
 ### 6. **X-Frame-Options Header Not Set**  
 - **Risk:** May allow clickjacking attacks.  
