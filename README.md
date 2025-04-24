@@ -3,6 +3,80 @@ This project created an advanced threat intelligence and risk management system 
 Key components include an asset-threat-vulnerability mapping system, automated alerting for high-risk threats, LLM-enhanced analysis, and a comprehensive dashboard displaying risk trends and mitigation recommendations. The system also provides incident response workflows, cost-benefit analysis for security decisions, and extensive documentation.
 By combining AI automation with blue team defense features, the platform enables ShopSmart to effectively monitor, assess, and mitigate cybersecurity risks in real-time.
 
+------------------------------------------------------------------------------------------
+
+
+# 🛠️ Week 9 Final System Testing, Security Validation, and Performance Optimization (20 April 2025)
+
+**Focus:**  
+Finalizing system security through penetration testing, validating system performance under load, preparing for production deployment, and documenting key maintenance and support resources.
+
+---
+
+## 🔍 Overview  
+In Week 9, the team completed final validations for the threat intelligence platform, focusing on robust security testing, performance optimization, and system hardening for production. Deployment was finalized, with production readiness verified on the target server environment. Internal QA and peer review processes were conducted, ensuring system quality. All troubleshooting and maintenance protocols were documented for long-term operational support.
+
+---
+
+## ✅ Tasks Completed
+
+### 🔒 1. Security Testing & Vulnerability Assessment  
+- Performed full-spectrum penetration testing using **OWASP ZAP**, **Burp Suite**, and **Nmap**.  
+- Identified and remediated vulnerabilities in alignment with **NIST standards**.  
+- 📄 *Deliverable:* `/docs/security_validation.md`
+
+---
+
+### ⚙️ 2. Load Testing & Performance Optimization  
+- Conducted performance and load testing using **Apache JMeter**.  
+- Optimized API response times and refined SQL queries for high-throughput conditions.  
+- 📄 *Deliverables:*  
+  - `/docs/performance_testing.md`  
+  - `/db/query_optimizations.sql`
+
+---
+
+### 🚀 3. Final Deployment & Production Readiness  
+- Secured deployment environment and configured logging/monitoring services.  
+- Completed deployment on **AWS EC2** and verified system availability and functionality.  
+- 📄 *Deliverable:* `/docs/deployment_checklist.md`
+
+---
+
+### 🧪 4. Peer Review & Internal QA  
+- Cross-reviewed system modules across team members.  
+- Documented all bugs and resolutions via **GitHub issue tracking**.  
+- 📄 *Deliverables:*  
+  - `/docs/peer_review.md`  
+  - `/docs/issue_tracking.md`
+
+---
+
+### 🛠️ 5. Troubleshooting & Maintenance Documentation  
+- Compiled common issues, fixes, and preventative maintenance tips.  
+- Developed a long-term guide to assist future developers and administrators.  
+- 📄 *Deliverable:* `/docs/troubleshooting_guide.md`
+
+---
+
+## 📂 Files Added/Updated
+
+| File/Directory                             | Description                                        |
+|-------------------------------------------|----------------------------------------------------|
+| `/docs/security_validation.md`            | Full security scan results and vulnerability fixes |
+| `/docs/performance_testing.md`            | Load test data and performance insights            |
+| `/db/query_optimizations.sql`             | Optimized SQL queries for better efficiency        |
+| `/docs/deployment_checklist.md`           | Final deployment checklist for production          |
+| `/docs/peer_review.md`                    | Peer review assignments and QA notes               |
+| `/docs/issue_tracking.md`                 | Bug tracking and issue log                         |
+| `/docs/troubleshooting_guide.md`          | Guide for post-deployment issue resolution         |
+
+---
+
+## 📌 All Deliverables Submitted: 20 April 2025
+
+
+
 -----------------------------------------------------------------------------------------
 
 
