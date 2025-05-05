@@ -7,21 +7,34 @@ import csv
 import os
 from datetime import datetime
 from report_generator import ThreatReport
+from dotenv import load_dotenv
+import asyncio
+from risk_assessment import update_tva_mapping
+from incident_response import update_responses
+from mitigation_recommendations import update_recommendations
+# from Scheduler import start_scheduler
+from risk_assessment import update_tva_mapping 
 
+
+# Load environment variables from .env file
+load_dotenv("threat-backend/.env")
+REPORTS_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'reports')
+os.makedirs(REPORTS_FOLDER, exist_ok=True)
 
 app = Flask(__name__, static_folder="threat-dashboard/build", static_url_path="")
-CORS(app)  # Allow frontend to access API
+CORS(app, origins=["https://main.d3cf9e8nk1orly.amplifyapp.com"], 
+     resources={r"/reports/*": {"origins": "*"}, r"/api/*": {"origins": "*"}}, 
+     supports_credentials=True)  # Allow frontend to access API
 
 
 def get_db_connection():
     try:
         conn = psycopg2.connect(
-            dbname="defaultdb", 
-            user="doadmin", 
-            password="******",
-            port = "25060", 
-            host="db-postgresql-nyc3-21525-do-user-20065838-0.k.db.ondigitalocean.com",
-            sslmode="require"  # Ensures secure connection
+            dbname=os.getenv('DB_NAME'), 
+            user=os.getenv('DB_USER'), 
+            password=os.getenv('DB_PASSWORD'),
+            port = os.getenv('DB_PORT'), 
+            host=os.getenv('DB_HOST'),
         )
         return conn
     except Exception as e:
@@ -99,14 +112,14 @@ def get_high_risk_threats():
                         SELECT 
                             t.threat_name,
                             t.risk_score,
-                            ms.mitigation_strategy AS mitigation_strategy,
+                            ms.mitigation_strategy,
                             ms.tva_mapping_id
                         FROM 
                             tva_mapping t
                         JOIN 
                             mitigation_strategies ms ON ms.tva_mapping_id = t.id
                         WHERE
-                            t.risk_score > 10;
+                            t.risk_score > 20;
         """)
         
         # Fetch the data from the query and format it into a list of dictionaries
@@ -142,7 +155,7 @@ def get_risk_trends():
         DATE(alert_date)
       ORDER BY 
         date ASC;
-    ;
+    
         """)
         
         # Fetch the data from the query and format it into a list of dictionaries
@@ -170,13 +183,13 @@ def get_mitigation_strategies():
 
         # Query to join 'tva_mapping' and 'mitigation_strategies' tables to get threats and their associated strategies
         cursor.execute("""
-                        SELECT 
-                            t.threat_name,
-                            ms.mitigation_strategy AS mitigation_strategy
-                        FROM 
-                            mitigation_strategies ms
-                        JOIN 
-                            tva_mapping t ON ms.tva_mapping_id = t.id;
+SELECT 
+    t.threat_name,
+    ms.mitigation_strategy
+FROM 
+    tva_mapping t
+JOIN 
+    mitigation_strategies ms ON t.id = ms.tva_mapping_id
         """)
         
         # Fetch the data from the query and format it into a list of dictionaries
@@ -224,13 +237,13 @@ def generate_pdf_report():
         
         # Get mitigation strategies
         cursor.execute("""
-            SELECT 
+         SELECT 
                 t.threat_name,
-                ms.mitigation_strategy AS mitigation_strategy
+                ms.mitigation_strategy
             FROM 
-                mitigation_strategies ms
+                tva_mapping t
             JOIN 
-                tva_mapping t ON ms.tva_mapping_id = t.id
+                mitigation_strategies ms ON t.id = ms.tva_mapping_id
         """)
         
         mitigations = [
@@ -239,11 +252,12 @@ def generate_pdf_report():
         ]
         
         # Create directory for reports if it doesn't exist
-        os.makedirs("reports", exist_ok=True)
+     
         
         # Generate PDF
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        pdf_filename = f"reports/threat_report_{timestamp}.pdf"
+        pdf_filename = f"threat_report_{timestamp}.pdf"  # Just the filename, not the path
+        pdf_path = os.path.join(REPORTS_FOLDER, pdf_filename)  # Full path for internal use
         
         pdf = ThreatReport()
         pdf.add_page()
@@ -272,13 +286,12 @@ def generate_pdf_report():
         for mitigation in mitigations:
             pdf.add_mitigation(mitigation["threat"], mitigation["strategies"])
         
-        pdf.output(pdf_filename)
+        pdf.output(pdf_path)  # Use the full path here
         
         cursor.close()
         conn.close()
         
-        return jsonify({"success": True, "file": pdf_filename})
-    
+        return jsonify({"success": True, "file": f"/reports/{pdf_filename}"})
     except Exception as e:
         return jsonify({"error": f"Failed to generate PDF report: {str(e)}"}), 500
 
@@ -300,13 +313,14 @@ def generate_csv_report():
         ]
         
         # Create directory for reports if it doesn't exist
-        os.makedirs("reports", exist_ok=True)
+     
         
         # Generate CSV
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        csv_filename = f"reports/threat_report_{timestamp}.csv"
+        csv_filename = f"threat_report_{timestamp}.csv"  # Just the filename, not the path
+        csv_path = os.path.join(REPORTS_FOLDER, csv_filename)  # Full path for internal use
         
-        with open(csv_filename, 'w', newline='') as csvfile:
+        with open(csv_path, 'w', newline='') as csvfile:
             fieldnames = ['Threat', 'Vulnerability', 'Likelihood', 'Impact', 'Risk Score', 'Date']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             
@@ -324,15 +338,30 @@ def generate_csv_report():
         cursor.close()
         conn.close()
         
-        return jsonify({"success": True, "file": csv_filename})
+        return jsonify({"success": True, "file": f"/reports/{csv_filename}"})
+
     
     except Exception as e:
         return jsonify({"error": f"Failed to generate CSV report: {str(e)}"}), 500
+    
+# start_scheduler()
+def on_startup():
+    async def run_all():
+        await update_tva_mapping()
+        await update_responses()
+        await update_recommendations()
+    
+    try:
+        print("Running startup routines...")
+        asyncio.run(run_all())
+        print("Startup routines completed.")
+    except Exception as e:
+        print(f"Startup error: {e}")
 
 # Add a route to download generated reports
 @app.route('/reports/<path:filename>', methods=['GET'])
 def download_report(filename):
-    return send_from_directory('reports', filename)
+    return send_from_directory(REPORTS_FOLDER, filename)
 
 # Serve static files (JS, CSS, images, etc.)
 @app.route('/<path:path>')
@@ -340,4 +369,5 @@ def serve_static_files(path):
     return send_from_directory(app.static_folder, path)
 
 if __name__ == '__main__':
+   # asyncio.run(on_startup())  # ✅ runs your functions on startup
     app.run(debug=True, port=5000)
