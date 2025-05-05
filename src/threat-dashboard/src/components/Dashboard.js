@@ -20,15 +20,13 @@ import {
   IconButton,
   Container,
   Divider,
-  Alert,
-  useTheme,
   ThemeProvider,
   createTheme,
   CssBaseline,
   Button,
   Stack,
 } from "@mui/material";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LineChart, Line, Legend, PieChart, Pie } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, Legend, PieChart, Pie } from "recharts";
 import SecurityIcon from '@mui/icons-material/Security';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -257,58 +255,71 @@ export default function ThreatDashboard() {
           </Toolbar>
         </AppBar>
         
-        {/* Report Generation Buttons */}
-        <Box sx={{ backgroundColor: 'background.paper', p: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }}>
-          <Container maxWidth="xl">
-            <Stack 
-              direction="row" 
-              spacing={2} 
-              justifyContent="flex-end" 
-              alignItems="center"
-            >
-              <Button
-                variant="outlined"
-                color="primary"
-                startIcon={<FileDownloadIcon />}
-                onClick={() => {
-                  fetch('http://localhost:5000/api/generate-csv-report')
-                    .then(response => response.json())
-                    .then(data => {
-                      if (data.success) {
-                        window.location.href = `http://localhost:5000/${data.file}`;
-                      } else {
-                        console.error(data.error);
-                        // You might want to display an error message to the user
-                      }
-                    });
-                }}
-                
-              >
-                Export CSV Report
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<PictureAsPdfIcon />}
-                onClick={() => {
-                  fetch('http://localhost:5000/api/generate-pdf-report')
-                    .then(response => response.json())
-                    .then(data => {
-                      if (data.success) {
-                        window.location.href = `http://localhost:5000/${data.file}`;
-                      } else {
-                        console.error(data.error);
-                        // You might want to display an error message to the user
-                      }
-                    });
-                }}
-              >
-                Generate PDF Report
-              </Button>
-            </Stack>
-          </Container>
-        </Box>
-        
+        // Report Generation Buttons
+<Box sx={{ backgroundColor: 'background.paper', p: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }}>
+  <Container maxWidth="xl">
+    <Stack 
+      direction="row" 
+      spacing={2} 
+      justifyContent="flex-end" 
+      alignItems="center"
+    >
+  // For the CSV report button:
+<Button
+  variant="outlined"
+  color="primary"
+  startIcon={<FileDownloadIcon />}
+  onClick={() => {
+    fetch('http://localhost:5000/api/generate-csv-report')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Correctly construct the URL with the reports/ path
+          window.location.href = `http://localhost:5000/reports/${data.file}`;
+        } else {
+          console.error(data.error);
+          alert("Failed to generate CSV report: " + (data.error || "Unknown error"));
+        }
+      })
+      .catch(error => {
+        console.error("Error generating CSV report:", error);
+        alert("Error generating CSV report. Check console for details.");
+      });
+  }}
+>
+  Export CSV Report
+</Button>
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<PictureAsPdfIcon />}
+        onClick={() => {
+          fetch('http://localhost:5000/api/generate-pdf-report')
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                // Extract just the filename from the path
+                const filename = data.file.split('/').pop();
+                // Create the correct download URL
+                window.location.href = `http://localhost:5000/reports/reports/${filename}`;
+              } else {
+                console.error(data.error);
+                // You could add an alert or toast notification here
+                alert("Failed to generate PDF report: " + (data.error || "Unknown error"));
+              }
+            })
+            .catch(error => {
+              console.error("Error generating PDF report:", error);
+              alert("Error generating PDF report. Check console for details.");
+            });
+        }}
+      >
+        Generate PDF Report
+      </Button>
+    </Stack>
+  </Container>
+</Box>
+
         <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
           {/* Overview Cards */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
